@@ -1,0 +1,82 @@
+<html>
+    <head>
+        <meta http-equiv="Content-type" content="text/html; charset=utf-8"/>
+        <title>3. Securing URLs</title>
+        <link rel="stylesheet" href="../css/main.css" type="text/css" media="screen" title="Ref" charset="utf-8"/>
+    </head>
+    <body class="body">
+    <h1><a name="3. Securing URLs">3. Securing URLs</a></h1>There are three ways to configure request mappings to secure application URLs. The goal is to create a mapping of URL patterns to the roles required to access those URLs. Use whichever approach makes the most sense for you. The three approaches are:
+<ul class="star">
+<li><code>&#64;Secured</code> annotations</li>
+<li>a simple Map in <code>Config.groovy</code></li>
+<li><code>Requestmap</code> domain class instances stored in the database</li>
+</ul><p class="paragraph"/>and the default approach is to use annotations. You can only use one method at a time, and it's configured with the <code>securityConfigType</code> attribute; the value has to be an <code>SecurityConfigType</code> enum value.<p class="paragraph"/>To use annotations, specify <code>SecurityConfigType.Annotation</code> (or leave it unspecified since it's the default):<p class="paragraph"/><div class="code"><pre><span class="java&#45;keyword">import</span> grails.plugins.springsecurity.SecurityConfigType<p class="paragraph"/>...<p class="paragraph"/>grails.plugins.springsecurity.securityConfigType = SecurityConfigType.Annotation</pre></div><p class="paragraph"/>To use the <code>Config.groovy</code> Map, specify <code>SecurityConfigType.InterceptUrlMap</code>:<p class="paragraph"/><div class="code"><pre><span class="java&#45;keyword">import</span> grails.plugins.springsecurity.SecurityConfigType<p class="paragraph"/>...<p class="paragraph"/>grails.plugins.springsecurity.securityConfigType = SecurityConfigType.InterceptUrlMap</pre></div><p class="paragraph"/>To use <code>Requestmap</code> entries, specify <code>SecurityConfigType.Requestmap</code>:<p class="paragraph"/><div class="code"><pre><span class="java&#45;keyword">import</span> grails.plugins.springsecurity.SecurityConfigType<p class="paragraph"/>...<p class="paragraph"/>grails.plugins.springsecurity.securityConfigType = SecurityConfigType.Requestmap</pre></div><p class="paragraph"/>In addition, you can use a pessimistic 'lockdown' approach if you like. Most applications are mostly public, with some pages only accessible to authenticated users with various roles. Here it makes more sense to leave URLs open by default and restrict access one a case-by-case basis. But if your app is primarily secure, you can deny access to all URLs that don't have an applicable URL-Role configuration.<p class="paragraph"/>To use the pessimistic approach, add this to <code>grails-app/conf/Config.groovy</code>:<p class="paragraph"/><div class="code"><pre>grails.plugins.springsecurity.rejectIfNoRule = <span class="java&#45;keyword">true</span></pre></div><p class="paragraph"/>and any requested URL that doesn't have a corresponding rule will be denied to all users.<p class="paragraph"/><h4>URLs and authorities</h4><p class="paragraph"/>In each approach you configure a mapping for a URL pattern to the role(s) that are required to access those URLs, e.g. <code>/admin/user/&#42;&#42;</code> requires <code>ROLE_ADMIN</code>. In addition, you can combine the role(s) with tokens such as IS_AUTHENTICATED_ANONYMOUSLY, IS_AUTHENTICATED_REMEMBERED, and IS_AUTHENTICATED_FULLY. One or more <code>Voter</code>s will process any tokens and enforce a rule based on them:
+<ul class="star">
+<li><code>IS_AUTHENTICATED_ANONYMOUSLY</code></li>
+<ul class="star">
+<li>signifies that anyone can access this URL; by default the <code>AnonymousAuthenticationFilter</code> ensures that there's an 'anonymous' <code>Authentication</code> with no roles so every user has an authentication, so this token just requires any authentication, even anonymous</li>
+</ul>
+<li><code>IS_AUTHENTICATED_REMEMBERED</code></li>
+<ul class="star">
+<li>signifies that the user is authenticated via a remember-me cookie or an explicit login</li>
+</ul>
+<li><code>IS_AUTHENTICATED_FULLY</code></li>
+<ul class="star">
+<li>requires that the user be fully authenticated via an explicit login</li>
+</ul></ul><p class="paragraph"/><code>IS_AUTHENTICATED_FULLY</code> is useful to implement a security scheme where you allow users to check a remember-me checkbox during login, and auto-authenticate them each time they come back to your site, but require them to login with a password for some parts of the site. For example regular browsing might be allowed and even adding items to a shopping cart with only a cookie, but checking out or viewing purchase history would require an explicit login.<p class="paragraph"/><h4>Advantages and disadvantages</h4><p class="paragraph"/>Each approach has its advantages and disadvantages. Annotations and the <code>Config.groovy</code> Map are less flexible since they're configured once in the code and can only be updated by restarting the application (in prod mode anyway). In practice this isn't that serious a concern since for most applications security mappings are unlikely to change at runtime.<p class="paragraph"/>If you want runtime-configurability then storing <code>Requestmap</code> entries enables this. This allows you to have a core set of rules populated at application startup and to edit, add, and delete them whenever you like. But it separates the security rules from the application code, which is less convenient than having the rules defined in <code>grails-app/conf/Config.groovy</code> or in the applicable controllers using annotations.<p class="paragraph"/><h4>Some notes</h4>
+<ul class="star">
+<li>to understand the meaning of <code>IS_AUTHENTICATED_FULLY</code>, <code>IS_AUTHENTICATED_REMEMBERED</code>, and <code>IS_AUTHENTICATED_ANONYMOUSLY</code>, see the Javadoc for <a href="http://static.springsource.org/spring-security/site/docs/3.0.x/apidocs/org/springframework/security/access/vote/AuthenticatedVoter.html" target="blank">AuthenticatedVoter</a></li>
+<li>URLs must be mapped in lowercase if using the <code>Requestmap</code> or <code>grails-app/conf/Config.groovy</code> map approaches, so for example if you have a FooBarController, its urls will be of the form /fooBar/list, /fooBar/create, etc. but these must be mapped as /foobar/, /foobar/list, /foobar/create. This is handled automatically for you if you use annotations.</li>
+</ul><p class="paragraph"/><h2><a name="3.1 Annotations">3.1 Annotations</a></h2>The plugin supplies an <code>&#64;Secured</code> annotation that you can use in your controllers to configure which roles are required for which actions.<p class="paragraph"/>You can define the annotation at the class level, meaning that the specified roles are required for all actions, or at the action level, or both. If the class and an action are annotated then the action annotation values will be used since they're more specific.<p class="paragraph"/>For example, given this controller:<p class="paragraph"/><div class="code"><pre><span class="java&#45;keyword">package</span> com.mycompany.myapp<p class="paragraph"/><span class="java&#45;keyword">import</span> grails.plugins.springsecurity.Secured<p class="paragraph"/>class SecureAnnotatedController &#123;<p class="paragraph"/>   @Secured(&#91;'ROLE_ADMIN'&#93;)
+   def index = &#123;
+      render 'you have ROLE_ADMIN'
+   &#125;<p class="paragraph"/>   @Secured(&#91;'ROLE_ADMIN', 'ROLE_SUPERUSER'&#93;)
+   def adminEither = &#123;
+      render 'you have ROLE_ADMIN or SUPERUSER'
+   &#125;<p class="paragraph"/>   def anybody = &#123;
+      render 'anyone can see <span class="java&#45;keyword">this</span>'
+   &#125;
+&#125;</pre></div><p class="paragraph"/>you'd need to be authenticated and have <code>ROLE_ADMIN</code> to see <code>/myapp/secureAnnotated</code> (or <code>/myapp/secureAnnotated/index</code>) and be authenticated and have <code>ROLE_ADMIN</code> or <code>ROLE_SUPERUSER</code> to see <code>/myapp/secureAnnotated/adminEither</code>. Any user can access <code>/myapp/secureAnnotated/anybody</code>.<p class="paragraph"/>Quite often most actions in a controller require similar access rules, so you can also define annotations at the class level:<p class="paragraph"/><div class="code"><pre><span class="java&#45;keyword">package</span> com.mycompany.myapp<p class="paragraph"/><span class="java&#45;keyword">import</span> grails.plugins.springsecurity.Secured<p class="paragraph"/>@Secured(&#91;'ROLE_ADMIN'&#93;)
+class SecureClassAnnotatedController &#123;<p class="paragraph"/>   def index = &#123;
+      render 'index: you have ROLE_ADMIN'
+   &#125;<p class="paragraph"/>   def otherAction = &#123;
+      render 'otherAction: you have ROLE_ADMIN'
+   &#125;<p class="paragraph"/>   @Secured(&#91;'ROLE_SUPERUSER'&#93;)
+   def <span class="java&#45;keyword">super</span> = &#123;
+      render '<span class="java&#45;keyword">super</span>: you have ROLE_SUPERUSER'
+   &#125;
+&#125;</pre></div><p class="paragraph"/>Here you'd need to be authenticated and have <code>ROLE_ADMIN</code> to see <code>/myapp/secureClassAnnotated</code> (or <code>/myapp/secureClassAnnotated/index</code>) or <code>/myapp/secureClassAnnotated/otherAction</code>. However you must have <code>ROLE_SUPERUSER</code> to access <code>/myapp/secureClassAnnotated/super</code> - the action-scope annotation overrides the class-scope annotation.<p class="paragraph"/><h4>controllerAnnotations.staticRules</h4><p class="paragraph"/>You can also define 'static' mappings that cannot be expressed in the controllers, such as '/<strong class="bold"></strong>' or for JavaScript, CSS, or image URLs. Use the <code>controllerAnnotations.staticRules</code> property, e.g.<p class="paragraph"/><div class="code"><pre>grails.plugins.springsecurity.controllerAnnotations.staticRules = &#91;
+   '/js/admin/&#42;&#42;': &#91;'ROLE_ADMIN'&#93;,
+   '/somePlugin/&#42;&#42;': &#91;'ROLE_ADMIN'&#93;
+&#93;</pre></div><p class="paragraph"/>In this example we've mapped all URLs associated with 'somePlugin' to <code>ROLE_ADMIN</code>; annotations aren't an option here since you wouldn't want to edit plugin code for a change like this.
+<h2><a name="3.2 Config.groovy">3.2 Config.groovy</a></h2>To use this approach, just define a Map in <code>Config.groovy</code>:<p class="paragraph"/><div class="code"><pre>grails.plugins.springsecurity.interceptUrlMap = &#91;
+   '/secure/&#42;&#42;':    &#91;'ROLE_ADMIN'&#93;,
+   '/finance/&#42;&#42;':   &#91;'ROLE_FINANCE', 'IS_AUTHENTICATED_FULLY'&#93;,
+   '/js/&#42;&#42;':        &#91;'IS_AUTHENTICATED_ANONYMOUSLY'&#93;,
+   '/css/&#42;&#42;':       &#91;'IS_AUTHENTICATED_ANONYMOUSLY'&#93;,
+   '/images/&#42;&#42;':    &#91;'IS_AUTHENTICATED_ANONYMOUSLY'&#93;,
+   '/&#42;':            &#91;'IS_AUTHENTICATED_ANONYMOUSLY'&#93;,
+   '/login/&#42;&#42;':     &#91;'IS_AUTHENTICATED_ANONYMOUSLY'&#93;,
+   '/logout/&#42;&#42;':    &#91;'IS_AUTHENTICATED_ANONYMOUSLY'&#93;
+&#93;</pre></div><p class="paragraph"/>When using this approach, make sure that you order the rules correctly. The first applicable rule is used, so for example if you have a controller that has one set of rules but an action that has stricter access rules, e.g.<p class="paragraph"/><div class="code"><pre>'/secure/&#42;&#42;':              &#91;'ROLE_ADMIN', 'ROLE_SUPERUSER'&#93;,
+'/secure/reallysecure/&#42;&#42;': &#91;'ROLE_SUPERUSER'&#93;</pre></div><p class="paragraph"/>then this would fail - it wouldn't restrict access to <code>/secure/reallysecure/list</code> to a user with <code>ROLE_SUPERUSER</code> since the first URL pattern matches, so the second would be ignored. The correct mapping would be<p class="paragraph"/><div class="code"><pre>'/secure/reallysecure/&#42;&#42;': &#91;'ROLE_SUPERUSER'&#93;
+'/secure/&#42;&#42;':              &#91;'ROLE_ADMIN', 'ROLE_SUPERUSER'&#93;,</pre></div><p class="paragraph"/><h2><a name="3.3 Requestmap">3.3 Requestmap</a></h2>With this approach you store mapping entries in the database, using the <code>Requestmap</code> domain class. <code>Requestmap</code> has a <code>url</code> property which contains the secured URL pattern and a <code>configAttribute</code> property containing a comma-delimited list of required roles and/or tokens such as <code>IS_AUTHENTICATED_FULLY</code>, <code>IS_AUTHENTICATED_REMEMBERED</code>, and <code>IS_AUTHENTICATED_ANONYMOUSLY</code>.<p class="paragraph"/>Creation of <code>Requestmap</code> entries is the same as for any Grails domain class:<p class="paragraph"/><div class="code"><pre><span class="java&#45;keyword">new</span> Requestmap(url: '/js/&#42;&#42;', configAttribute: 'IS_AUTHENTICATED_ANONYMOUSLY').save()
+<span class="java&#45;keyword">new</span> Requestmap(url: '/css/&#42;&#42;', configAttribute: 'IS_AUTHENTICATED_ANONYMOUSLY').save()
+<span class="java&#45;keyword">new</span> Requestmap(url: '/images/&#42;&#42;', configAttribute: 'IS_AUTHENTICATED_ANONYMOUSLY').save()
+<span class="java&#45;keyword">new</span> Requestmap(url: '/login/&#42;&#42;', configAttribute: 'IS_AUTHENTICATED_ANONYMOUSLY').save()
+<span class="java&#45;keyword">new</span> Requestmap(url: '/logout/&#42;&#42;', configAttribute: 'IS_AUTHENTICATED_ANONYMOUSLY').save()
+<span class="java&#45;keyword">new</span> Requestmap(url: '/&#42;', configAttribute: 'IS_AUTHENTICATED_ANONYMOUSLY').save()
+<span class="java&#45;keyword">new</span> Requestmap(url: '/profile/&#42;&#42;', configAttribute: 'ROLE_USER').save()
+<span class="java&#45;keyword">new</span> Requestmap(url: '/admin/&#42;&#42;', configAttribute: 'ROLE_ADMIN').save()
+<span class="java&#45;keyword">new</span> Requestmap(url: '/admin/user/&#42;&#42;', configAttribute: 'ROLE_SUPERVISOR').save()</pre></div><p class="paragraph"/>Unlike the <code>Config.groovy</code> Map approach above, you don't need to worry about <code>Requestmap</code> entry order since the plugin calculates the most specific rule that applies to the current request.<p class="paragraph"/><h4>Requestmap cache</h4><p class="paragraph"/><code>Requestmap</code> entries are cached for performance, but this has an impact on runtime configurability. If you create, edit, or delete an instance, the cache must be flushed and repopulated to be consistent with the database. You can call <code>springSecurityService.clearCachedRequestmaps()</code> to do this. For example, if you create a <code>RequestmapController</code> the <code>save</code> action should look like this (and the update and delete actions should similarly call <code>clearCachedRequestmaps()</code>):<p class="paragraph"/><div class="code"><pre>class RequestmapController &#123;<p class="paragraph"/>   def springSecurityService<p class="paragraph"/>   ...<p class="paragraph"/>   def save = &#123;
+      def requestmapInstance = <span class="java&#45;keyword">new</span> Requestmap(params)
+      <span class="java&#45;keyword">if</span> (!requestmapInstance.save(flush: <span class="java&#45;keyword">true</span>)) &#123;
+         render view: 'create', model: &#91;requestmapInstance: requestmapInstance&#93;
+         <span class="java&#45;keyword">return</span>
+      &#125;<p class="paragraph"/>      springSecurityService.clearCachedRequestmaps()
+      flash.message = <span class="java&#45;quote">"$&#123;message(code: '<span class="java&#45;keyword">default</span>.created.message', args: &#91;message(code: 'requestmap.label', <span class="java&#45;keyword">default</span>: 'Requestmap'), requestmapInstance.id&#93;)&#125;"</span>
+      redirect action: show, id: requestmapInstance.id
+   &#125;
+&#125;</pre></div><p class="paragraph"/>
+    </body>
+</html>
