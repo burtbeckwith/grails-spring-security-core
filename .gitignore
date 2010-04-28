@@ -1,0 +1,6 @@
+cobertura.ser
+stacktrace.log
+/target
+/docs
+
+/testapps.config.groovy
