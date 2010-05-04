@@ -1,32 +1,37 @@
-<html>
-    <head>
-        <meta http-equiv="Content-type" content="text/html; charset=utf-8"/>
-        <title>3.1 Annotations</title>
-        <link rel="stylesheet" href="../css/main.css" type="text/css" media="screen" title="Ref" charset="utf-8"/>
-    </head>
-    <body class="body">
-    The plugin supplies an <code>&#64;Secured</code> annotation that you can use in your controllers to configure which roles are required for which actions.<p class="paragraph"/>You can define the annotation at the class level, meaning that the specified roles are required for all actions, or at the action level, or both. If the class and an action are annotated then the action annotation values will be used since they're more specific.<p class="paragraph"/>For example, given this controller:<p class="paragraph"/><div class="code"><pre><span class="java&#45;keyword">package</span> com.mycompany.myapp<p class="paragraph"/><span class="java&#45;keyword">import</span> grails.plugins.springsecurity.Secured<p class="paragraph"/>class SecureAnnotatedController &#123;<p class="paragraph"/>   @Secured(&#91;'ROLE_ADMIN'&#93;)
-   def index = &#123;
+<html><head><meta content='text/html; charset=utf-8' http-equiv='Content-type'></meta><title>3.1 Annotations</title><link title='Ref' charset='utf-8' rel='stylesheet' type='text/css' href='../css/main.css' media='screen'></link></head><body><body class='body'>
+    The plugin supplies an <code>@Secured</code> annotation that you can use in your controllers to configure which roles are required for which actions.<p class='paragraph'></p>You can define the annotation at the class level, meaning that the specified roles are required for all actions, or at the action level, or both. If the class and an action are annotated then the action annotation values will be used since they're more specific.<p class='paragraph'></p>For example, given this controller:<p class='paragraph'></p><div class='code'><pre><span class='java-keyword'>package</span> com.mycompany.myapp<p class='paragraph'></p><span class='java-keyword'>import</span> grails.plugins.springsecurity.Secured<p class='paragraph'></p>class SecureAnnotatedController {<p class='paragraph'></p>   @Secured(['ROLE_ADMIN'])
+   def index = {
       render 'you have ROLE_ADMIN'
-   &#125;<p class="paragraph"/>   @Secured(&#91;'ROLE_ADMIN', 'ROLE_SUPERUSER'&#93;)
-   def adminEither = &#123;
+   }<p class='paragraph'></p>   @Secured(['ROLE_ADMIN', 'ROLE_SUPERUSER'])
+   def adminEither = {
       render 'you have ROLE_ADMIN or SUPERUSER'
-   &#125;<p class="paragraph"/>   def anybody = &#123;
-      render 'anyone can see <span class="java&#45;keyword">this</span>'
-   &#125;
-&#125;</pre></div><p class="paragraph"/>you'd need to be authenticated and have <code>ROLE_ADMIN</code> to see <code>/myapp/secureAnnotated</code> (or <code>/myapp/secureAnnotated/index</code>) and be authenticated and have <code>ROLE_ADMIN</code> or <code>ROLE_SUPERUSER</code> to see <code>/myapp/secureAnnotated/adminEither</code>. Any user can access <code>/myapp/secureAnnotated/anybody</code>.<p class="paragraph"/>Quite often most actions in a controller require similar access rules, so you can also define annotations at the class level:<p class="paragraph"/><div class="code"><pre><span class="java&#45;keyword">package</span> com.mycompany.myapp<p class="paragraph"/><span class="java&#45;keyword">import</span> grails.plugins.springsecurity.Secured<p class="paragraph"/>@Secured(&#91;'ROLE_ADMIN'&#93;)
-class SecureClassAnnotatedController &#123;<p class="paragraph"/>   def index = &#123;
+   }<p class='paragraph'></p>   def anybody = {
+      render 'anyone can see <span class='java-keyword'>this</span>'
+   }
+}</pre></div><p class='paragraph'></p>you'd need to be authenticated and have <code>ROLE_ADMIN</code> to see <code>/myapp/secureAnnotated</code> (or <code>/myapp/secureAnnotated/index</code>) and be authenticated and have <code>ROLE_ADMIN</code> or <code>ROLE_SUPERUSER</code> to see <code>/myapp/secureAnnotated/adminEither</code>. Any user can access <code>/myapp/secureAnnotated/anybody</code>.<p class='paragraph'></p>Quite often most actions in a controller require similar access rules, so you can also define annotations at the class level:<p class='paragraph'></p><div class='code'><pre><span class='java-keyword'>package</span> com.mycompany.myapp<p class='paragraph'></p><span class='java-keyword'>import</span> grails.plugins.springsecurity.Secured<p class='paragraph'></p>@Secured(['ROLE_ADMIN'])
+class SecureClassAnnotatedController {<p class='paragraph'></p>   def index = {
       render 'index: you have ROLE_ADMIN'
-   &#125;<p class="paragraph"/>   def otherAction = &#123;
+   }<p class='paragraph'></p>   def otherAction = {
       render 'otherAction: you have ROLE_ADMIN'
-   &#125;<p class="paragraph"/>   @Secured(&#91;'ROLE_SUPERUSER'&#93;)
-   def <span class="java&#45;keyword">super</span> = &#123;
-      render '<span class="java&#45;keyword">super</span>: you have ROLE_SUPERUSER'
-   &#125;
-&#125;</pre></div><p class="paragraph"/>Here you'd need to be authenticated and have <code>ROLE_ADMIN</code> to see <code>/myapp/secureClassAnnotated</code> (or <code>/myapp/secureClassAnnotated/index</code>) or <code>/myapp/secureClassAnnotated/otherAction</code>. However you must have <code>ROLE_SUPERUSER</code> to access <code>/myapp/secureClassAnnotated/super</code> - the action-scope annotation overrides the class-scope annotation.<p class="paragraph"/><h4>controllerAnnotations.staticRules</h4><p class="paragraph"/>You can also define 'static' mappings that cannot be expressed in the controllers, such as '/<strong class="bold"></strong>' or for JavaScript, CSS, or image URLs. Use the <code>controllerAnnotations.staticRules</code> property, e.g.<p class="paragraph"/><div class="code"><pre>grails.plugins.springsecurity.controllerAnnotations.staticRules = &#91;
-   '/js/admin/&#42;&#42;': &#91;'ROLE_ADMIN'&#93;,
-   '/somePlugin/&#42;&#42;': &#91;'ROLE_ADMIN'&#93;
-&#93;</pre></div><p class="paragraph"/>In this example we've mapped all URLs associated with 'somePlugin' to <code>ROLE_ADMIN</code>; annotations aren't an option here since you wouldn't want to edit plugin code for a change like this.
+   }<p class='paragraph'></p>   @Secured(['ROLE_SUPERUSER'])
+   def <span class='java-keyword'>super</span> = {
+      render '<span class='java-keyword'>super</span>: you have ROLE_SUPERUSER'
+   }
+}</pre></div><p class='paragraph'></p>Here you'd need to be authenticated and have <code>ROLE_ADMIN</code> to see <code>/myapp/secureClassAnnotated</code> (or <code>/myapp/secureClassAnnotated/index</code>) or <code>/myapp/secureClassAnnotated/otherAction</code>. However you must have <code>ROLE_SUPERUSER</code> to access <code>/myapp/secureClassAnnotated/super</code> - the action-scope annotation overrides the class-scope annotation.<p class='paragraph'></p><h4>controllerAnnotations.staticRules</h4><p class='paragraph'></p>You can also define 'static' mappings that cannot be expressed in the controllers, such as '/<strong class='bold'></strong>' or for JavaScript, CSS, or image URLs. Use the <code>controllerAnnotations.staticRules</code> property, e.g.<p class='paragraph'></p><div class='code'><pre>grails.plugins.springsecurity.controllerAnnotations.staticRules = [
+   '/js/admin/**': ['ROLE_ADMIN'],
+   '/somePlugin/**': ['ROLE_ADMIN']
+]</pre></div><p class='paragraph'></p>In this example we've mapped all URLs associated with 'somePlugin' to <code>ROLE_ADMIN</code>; annotations aren't an option here since you wouldn't want to edit plugin code for a change like this.
 
-    </body>
-</html>
+    
+<script type="text/javascript">
+	var _gaq = _gaq || [];
+	_gaq.push(['_setAccount', 'UA-16219500-1']);
+	_gaq.push(['_trackPageview']);
+
+	(function() {
+		var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+		ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+		var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+	})();
+</script>
+</body></html>

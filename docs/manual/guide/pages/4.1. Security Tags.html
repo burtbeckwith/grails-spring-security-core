@@ -1,25 +1,29 @@
-<html>
-    <head>
-        <meta http-equiv="Content-type" content="text/html; charset=utf-8"/>
-        <title>4.1. Security Tags</title>
-        <link rel="stylesheet" href="../css/main.css" type="text/css" media="screen" title="Ref" charset="utf-8"/>
-    </head>
-    <body class="body">
-    The plugin comes with a few GSP tags to support conditional display based on whether the user is authenticated, and/or has the required role to perform some action. All of the tags are in the <code>sec</code> namespace and are implemented in <code>grails.plugins.springsecurity.SecurityTagLib</code>.<p class="paragraph"/><h4>ifLoggedIn</h4><p class="paragraph"/>Displays the inner body content if the user is authenticated.<p class="paragraph"/>Example:<p class="paragraph"/><div class="code"><pre>&#60;sec:ifLoggedIn&#62;
+<html><head><meta content='text/html; charset=utf-8' http-equiv='Content-type'></meta><title>4.1. Security Tags</title><link title='Ref' charset='utf-8' rel='stylesheet' type='text/css' href='../css/main.css' media='screen'></link></head><body><body class='body'>
+    The plugin comes with a few GSP tags to support conditional display based on whether the user is authenticated, and/or has the required role to perform some action. All of the tags are in the <code>sec</code> namespace and are implemented in <code>grails.plugins.springsecurity.SecurityTagLib</code>.<p class='paragraph'></p><h4>ifLoggedIn</h4><p class='paragraph'></p>Displays the inner body content if the user is authenticated.<p class='paragraph'></p>Example:<p class='paragraph'></p><div class='code'><pre>&lt;sec:ifLoggedIn&gt;
 Welcome Back!
-&#60;/sec:ifLoggedIn&#62;</pre></div><p class="paragraph"/><h4>ifNotLoggedIn</h4><p class="paragraph"/>Displays the inner body content if the user is not authenticated.<p class="paragraph"/>Example:<p class="paragraph"/><div class="code"><pre>&#60;sec:ifNotLoggedIn&#62;
-&#60;g:link controller='login' action='auth'&#62;Login&#60;/g:link&#62;
-&#60;/sec:ifNotLoggedIn&#62;</pre></div><p class="paragraph"/><h4>ifAllGranted</h4><p class="paragraph"/>Displays the inner body content only if all of the listed roles are granted.<p class="paragraph"/>Example:<p class="paragraph"/><div class="code"><pre>&#60;sec:ifAllGranted roles=<span class="java&#45;quote">"ROLE_ADMIN,ROLE_SUPERVISOR"</span>&#62;secure stuff here&#60;/sec:ifAllGranted&#62;</pre></div><p class="paragraph"/><h4>ifAnyGranted</h4><p class="paragraph"/>Displays the inner body content if at least one of the listed roles are granted.<p class="paragraph"/>Example:<p class="paragraph"/><div class="code"><pre>&#60;sec:ifAnyGranted roles=<span class="java&#45;quote">"ROLE_ADMIN,ROLE_SUPERVISOR"</span>&#62;secure stuff here&#60;/sec:ifAnyGranted&#62;</pre></div><p class="paragraph"/><h4>ifNotGranted</h4><p class="paragraph"/>Displays the inner body content if none of the listed roles are granted.<p class="paragraph"/>Example:<p class="paragraph"/><div class="code"><pre>&#60;sec:ifNotGranted roles=<span class="java&#45;quote">"ROLE_USER"</span>&#62;non&#45;user stuff here&#60;/sec:ifNotGranted&#62;</pre></div><p class="paragraph"/><h4> loggedInUserInfo</h4><p class="paragraph"/>Displays the value of the specified authentication field if logged in. For example this will show the username property:<p class="paragraph"/><div class="code"><pre>&#60;sec:loggedInUserInfo field=<span class="java&#45;quote">"username"</span>/&#62;</pre></div><p class="paragraph"/>and if you have customized the authentication to add a <code>fullName</code> property, you would access it using<p class="paragraph"/><div class="code"><pre>Welcome Back &#60;sec:loggedInUserInfo field=<span class="java&#45;quote">"fullName"</span>/&#62;</pre></div><p class="paragraph"/><h4> username</h4><p class="paragraph"/>Displays the value of the authentication <code>username</code> field if logged in.<p class="paragraph"/><div class="code"><pre>&#60;sec:ifLoggedIn&#62;
-Welcome Back &#60;sec:username/&#62;!
-&#60;/sec:ifLoggedIn&#62;
-&#60;sec:ifNotLoggedIn&#62;
-&#60;g:link controller='login' action='auth'&#62;Login&#60;/g:link&#62;
-&#60;/sec:ifNotLoggedIn&#62;</pre></div><p class="paragraph"/><h4>ifSwitched</h4><p class="paragraph"/>Displays the inner body content only if the current user switched from another user.<p class="paragraph"/><div class="code"><pre>&#60;sec:ifLoggedIn&#62;
-Logged in as &#60;sec:username/&#62;
-&#60;/sec:ifLoggedIn&#62;<p class="paragraph"/>&#60;sec:ifSwitched&#62;
-&#60;a href='$&#123;request.contextPath&#125;/j_spring_security_exit_user'&#62;
-   Resume as &#60;sec:switchedUserOriginalUsername/&#62;
-&#60;/a&#62;
-&#60;/sec:ifSwitched&#62;<p class="paragraph"/>&#60;sec:ifNotSwitched&#62;<p class="paragraph"/>   &#60;sec:ifAllGranted roles='ROLE_SWITCH_USER'&#62;<p class="paragraph"/>   &#60;form action='$&#123;request.contextPath&#125;/j_spring_security_switch_user' method='POST'&#62;<p class="paragraph"/>      Switch to user: &#60;input type='text' name='j_username'/&#62;&#60;br/&#62;<p class="paragraph"/>      &#60;input type='submit' value='Switch'/&#62; &#60;/form&#62;<p class="paragraph"/>   &#60;/sec:ifAllGranted&#62;<p class="paragraph"/>&#60;/sec:ifNotSwitched&#62;</pre></div><p class="paragraph"/><h4>ifNotSwitched</h4><p class="paragraph"/>Displays the inner body content only if the current user has not switched from another user.<p class="paragraph"/><h4>switchedUserOriginalUsername</h4><p class="paragraph"/>Renders the original user's username if the current user switched from another user.<p class="paragraph"/>
-    </body>
-</html>
+&lt;/sec:ifLoggedIn&gt;</pre></div><p class='paragraph'></p><h4>ifNotLoggedIn</h4><p class='paragraph'></p>Displays the inner body content if the user is not authenticated.<p class='paragraph'></p>Example:<p class='paragraph'></p><div class='code'><pre>&lt;sec:ifNotLoggedIn&gt;
+&lt;g:link controller='login' action='auth'&gt;Login&lt;/g:link&gt;
+&lt;/sec:ifNotLoggedIn&gt;</pre></div><p class='paragraph'></p><h4>ifAllGranted</h4><p class='paragraph'></p>Displays the inner body content only if all of the listed roles are granted.<p class='paragraph'></p>Example:<p class='paragraph'></p><div class='code'><pre>&lt;sec:ifAllGranted roles=<span class='java-quote'>"ROLE_ADMIN,ROLE_SUPERVISOR"</span>&gt;secure stuff here&lt;/sec:ifAllGranted&gt;</pre></div><p class='paragraph'></p><h4>ifAnyGranted</h4><p class='paragraph'></p>Displays the inner body content if at least one of the listed roles are granted.<p class='paragraph'></p>Example:<p class='paragraph'></p><div class='code'><pre>&lt;sec:ifAnyGranted roles=<span class='java-quote'>"ROLE_ADMIN,ROLE_SUPERVISOR"</span>&gt;secure stuff here&lt;/sec:ifAnyGranted&gt;</pre></div><p class='paragraph'></p><h4>ifNotGranted</h4><p class='paragraph'></p>Displays the inner body content if none of the listed roles are granted.<p class='paragraph'></p>Example:<p class='paragraph'></p><div class='code'><pre>&lt;sec:ifNotGranted roles=<span class='java-quote'>"ROLE_USER"</span>&gt;non-user stuff here&lt;/sec:ifNotGranted&gt;</pre></div><p class='paragraph'></p><h4> loggedInUserInfo</h4><p class='paragraph'></p>Displays the value of the specified authentication field if logged in. For example this will show the username property:<p class='paragraph'></p><div class='code'><pre>&lt;sec:loggedInUserInfo field=<span class='java-quote'>"username"</span>/&gt;</pre></div><p class='paragraph'></p>and if you have customized the authentication to add a <code>fullName</code> property, you would access it using<p class='paragraph'></p><div class='code'><pre>Welcome Back &lt;sec:loggedInUserInfo field=<span class='java-quote'>"fullName"</span>/&gt;</pre></div><p class='paragraph'></p><h4> username</h4><p class='paragraph'></p>Displays the value of the authentication <code>username</code> field if logged in.<p class='paragraph'></p><div class='code'><pre>&lt;sec:ifLoggedIn&gt;
+Welcome Back &lt;sec:username/&gt;!
+&lt;/sec:ifLoggedIn&gt;
+&lt;sec:ifNotLoggedIn&gt;
+&lt;g:link controller='login' action='auth'&gt;Login&lt;/g:link&gt;
+&lt;/sec:ifNotLoggedIn&gt;</pre></div><p class='paragraph'></p><h4>ifSwitched</h4><p class='paragraph'></p>Displays the inner body content only if the current user switched from another user.<p class='paragraph'></p><div class='code'><pre>&lt;sec:ifLoggedIn&gt;
+Logged in as &lt;sec:username/&gt;
+&lt;/sec:ifLoggedIn&gt;<p class='paragraph'></p>&lt;sec:ifSwitched&gt;
+&lt;a href='${request.contextPath}/j_spring_security_exit_user'&gt;
+   Resume as &lt;sec:switchedUserOriginalUsername/&gt;
+&lt;/a&gt;
+&lt;/sec:ifSwitched&gt;<p class='paragraph'></p>&lt;sec:ifNotSwitched&gt;<p class='paragraph'></p>   &lt;sec:ifAllGranted roles='ROLE_SWITCH_USER'&gt;<p class='paragraph'></p>   &lt;form action='${request.contextPath}/j_spring_security_switch_user' method='POST'&gt;<p class='paragraph'></p>      Switch to user: &lt;input type='text' name='j_username'/&gt;&lt;br/&gt;<p class='paragraph'></p>      &lt;input type='submit' value='Switch'/&gt; &lt;/form&gt;<p class='paragraph'></p>   &lt;/sec:ifAllGranted&gt;<p class='paragraph'></p>&lt;/sec:ifNotSwitched&gt;</pre></div><p class='paragraph'></p><h4>ifNotSwitched</h4><p class='paragraph'></p>Displays the inner body content only if the current user has not switched from another user.<p class='paragraph'></p><h4>switchedUserOriginalUsername</h4><p class='paragraph'></p>Renders the original user's username if the current user switched from another user.<p class='paragraph'></p>
+<script type="text/javascript">
+	var _gaq = _gaq || [];
+	_gaq.push(['_setAccount', 'UA-16219500-1']);
+	_gaq.push(['_trackPageview']);
+
+	(function() {
+		var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+		ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+		var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+	})();
+</script>
+</body></html>

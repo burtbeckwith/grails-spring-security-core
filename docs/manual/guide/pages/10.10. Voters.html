@@ -1,17 +1,20 @@
-<html>
-    <head>
-        <meta http-equiv="Content-type" content="text/html; charset=utf-8"/>
-        <title>10.10. Voters</title>
-        <link rel="stylesheet" href="../css/main.css" type="text/css" media="screen" title="Ref" charset="utf-8"/>
-    </head>
-    <body class="body">
-    Spring Security allows you to register a list of voters (implementing the <a href="http://static.springsource.org/spring-security/site/docs/3.0.x/apidocs/org/springframework/security/access/AccessDecisionVoter.html" target="blank">AccessDecisionVoter</a> interface) that check that a successful authentication is applicable for the current request. By default a <code>roleVoter</code> bean is registered to ensure users have the required roles for the request, and an <code>authenticatedVoter</code> bean is registered to support <code>IS_AUTHENTICATED_FULLY</code>, <code>IS_AUTHENTICATED_REMEMBERED</code>, and <code>IS_AUTHENTICATED_ANONYMOUSLY</code> tokens.<p class="paragraph"/>To customize this list, you define a <code>voterNames</code> attribute with a list of bean names. The beans must be declared either by the plugin, or yourself in resources.groovy or resources.xml. So if you have a custom MyAccessDecisionVoter in resources.groovy, e.g.<p class="paragraph"/><div class="code"><pre>beans = &#123;
-   myAccessDecisionVoter(com.foo.MyAccessDecisionVoter) &#123;
+<html><head><meta content='text/html; charset=utf-8' http-equiv='Content-type'></meta><title>10.10. Voters</title><link title='Ref' charset='utf-8' rel='stylesheet' type='text/css' href='../css/main.css' media='screen'></link></head><body><body class='body'>
+    Spring Security allows you to register a list of voters (implementing the <a target='blank' href='http://static.springsource.org/spring-security/site/docs/3.0.x/apidocs/org/springframework/security/access/AccessDecisionVoter.html'>AccessDecisionVoter</a> interface) that check that a successful authentication is applicable for the current request. By default a <code>roleVoter</code> bean is registered to ensure users have the required roles for the request, and an <code>authenticatedVoter</code> bean is registered to support <code>IS_AUTHENTICATED_FULLY</code>, <code>IS_AUTHENTICATED_REMEMBERED</code>, and <code>IS_AUTHENTICATED_ANONYMOUSLY</code> tokens.<p class='paragraph'></p>To customize this list, you define a <code>voterNames</code> attribute with a list of bean names. The beans must be declared either by the plugin, or yourself in resources.groovy or resources.xml. So if you have a custom MyAccessDecisionVoter in resources.groovy, e.g.<p class='paragraph'></p><div class='code'><pre>beans = {
+   myAccessDecisionVoter(com.foo.MyAccessDecisionVoter) {
       // attributes
-   &#125;
-&#125;</pre></div><p class="paragraph"/>then you'd register it in <code>grails-app/conf/Config.groovy</code> as:<p class="paragraph"/><div class="code"><pre>grails.plugins.springsecurity.voterNames = &#91;
+   }
+}</pre></div><p class='paragraph'></p>then you'd register it in <code>grails-app/conf/Config.groovy</code> as:<p class='paragraph'></p><div class='code'><pre>grails.plugins.springsecurity.voterNames = [
    'authenticatedVoter', 'roleVoter', 'myAccessDecisionVoter'
-&#93;</pre></div><p class="paragraph"/>
+]</pre></div><p class='paragraph'></p>
+<script type="text/javascript">
+	var _gaq = _gaq || [];
+	_gaq.push(['_setAccount', 'UA-16219500-1']);
+	_gaq.push(['_trackPageview']);
 
-    </body>
-</html>
+	(function() {
+		var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+		ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+		var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+	})();
+</script>
+</body></html>

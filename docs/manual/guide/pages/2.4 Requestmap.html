@@ -1,18 +1,23 @@
-<html>
-    <head>
-        <meta http-equiv="Content-type" content="text/html; charset=utf-8"/>
-        <title>2.4 Requestmap</title>
-        <link rel="stylesheet" href="../css/main.css" type="text/css" media="screen" title="Ref" charset="utf-8"/>
-    </head>
-    <body class="body">
-    This class is optionally used to store request mapping entries in the database instead of defining them with annotations or in <code>Config.groovy</code>. This has the advantage of being configurable at runtime; you can add, remove and edit rules without restarting your application.<p class="paragraph"/>Assuming you choose <code>com.mycompany.myapp</code> as your package, and <code>Requestmap</code> as your class name, you'll generate this class:<p class="paragraph"/><div class="code"><pre><span class="java&#45;keyword">package</span> com.testapp<p class="paragraph"/>class Requestmap &#123;<p class="paragraph"/>   <span class="java&#45;object">String</span> url
-   <span class="java&#45;object">String</span> configAttribute<p class="paragraph"/>   <span class="java&#45;keyword">static</span> mapping = &#123;
-      cache <span class="java&#45;keyword">true</span>
-   &#125;<p class="paragraph"/>   <span class="java&#45;keyword">static</span> constraints = &#123;
-      url blank: <span class="java&#45;keyword">false</span>, unique: <span class="java&#45;keyword">true</span>
-      configAttribute blank: <span class="java&#45;keyword">false</span>
-   &#125;
-&#125;</pre></div><p class="paragraph"/>The class and property names are configurable using these configuration attributes:<p class="paragraph"/><table class="wiki-table" cellpadding="0" cellspacing="0" border="0"><tr><th><strong class="bold">Property</strong></th><th><strong class="bold">Default Value</strong></th><th><strong class="bold">Meaning</strong></th></tr><tr class="table-odd"><td>requestMap.className</td><td>'Requestmap'</td><td>requestmap class name</td></tr><tr class="table-even"><td>requestMap.urlField</td><td>'url'</td><td>URL pattern field name</td></tr><tr class="table-odd"><td>requestMap.configAttributeField</td><td>'configAttribute'</td><td>authority pattern field name</td></tr></table><p class="paragraph"/>See <a href="../guide/single.html#3.3 Requestmap" class="guide">this section</a> on URL mapping for details on using Requestmap entries to guard URLs.
+<html><head><meta content='text/html; charset=utf-8' http-equiv='Content-type'></meta><title>2.4 Requestmap</title><link title='Ref' charset='utf-8' rel='stylesheet' type='text/css' href='../css/main.css' media='screen'></link></head><body><body class='body'>
+    This class is optionally used to store request mapping entries in the database instead of defining them with annotations or in <code>Config.groovy</code>. This has the advantage of being configurable at runtime; you can add, remove and edit rules without restarting your application.<p class='paragraph'></p>Assuming you choose <code>com.mycompany.myapp</code> as your package, and <code>Requestmap</code> as your class name, you'll generate this class:<p class='paragraph'></p><div class='code'><pre><span class='java-keyword'>package</span> com.testapp<p class='paragraph'></p>class Requestmap {<p class='paragraph'></p><span class='java-object'>String</span> url
+   <span class='java-object'>String</span> configAttribute<p class='paragraph'></p><span class='java-keyword'>static</span> mapping = {
+      cache <span class='java-keyword'>true</span>
+   }<p class='paragraph'></p><span class='java-keyword'>static</span> constraints = {
+      url blank: <span class='java-keyword'>false</span>, unique: <span class='java-keyword'>true</span>
+      configAttribute blank: <span class='java-keyword'>false</span>
+   }
+}</pre></div><p class='paragraph'></p>The class and property names are configurable using these configuration attributes:<p class='paragraph'></p><table cellpadding='0' class='wiki-table' border='0' cellspacing='0'><tr><th><strong class='bold'>Property</strong></th><th><strong class='bold'>Default Value</strong></th><th><strong class='bold'>Meaning</strong></th></tr><tr class='table-odd'><td>requestMap.className</td><td>'Requestmap'</td><td>requestmap class name</td></tr><tr class='table-even'><td>requestMap.urlField</td><td>'url'</td><td>URL pattern field name</td></tr><tr class='table-odd'><td>requestMap.configAttributeField</td><td>'configAttribute'</td><td>authority pattern field name</td></tr></table><p class='paragraph'></p>See <a class='guide' href='../guide/single.html#3.3 Requestmap'>this section</a> on URL mapping for details on using Requestmap entries to guard URLs.
 
-    </body>
-</html>
+    
+<script type="text/javascript">
+	var _gaq = _gaq || [];
+	_gaq.push(['_setAccount', 'UA-16219500-1']);
+	_gaq.push(['_trackPageview']);
+
+	(function() {
+		var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+		ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+		var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+	})();
+</script>
+</body></html>
