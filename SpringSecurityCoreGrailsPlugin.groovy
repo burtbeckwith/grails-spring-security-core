@@ -47,11 +47,13 @@ import org.springframework.security.web.access.channel.InsecureChannelProcessor
 import org.springframework.security.web.access.channel.RetryWithHttpEntryPoint
 import org.springframework.security.web.access.channel.RetryWithHttpsEntryPoint
 import org.springframework.security.web.access.channel.SecureChannelProcessor
+import org.springframework.security.web.access.expression.DefaultWebSecurityExpressionHandler
 import org.springframework.security.web.access.intercept.FilterSecurityInterceptor
 import org.springframework.security.web.authentication.AnonymousAuthenticationFilter
 import org.springframework.security.web.authentication.Http403ForbiddenEntryPoint
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler
+import org.springframework.security.web.authentication.logout.SimpleUrlLogoutSuccessHandler
 import org.springframework.security.web.authentication.rememberme.InMemoryTokenRepositoryImpl
 import org.springframework.security.web.authentication.rememberme.PersistentTokenBasedRememberMeServices
 import org.springframework.security.web.authentication.rememberme.RememberMeAuthenticationFilter
@@ -85,7 +87,7 @@ import org.codehaus.groovy.grails.plugins.springsecurity.GormPersistentTokenRepo
 import org.codehaus.groovy.grails.plugins.springsecurity.GormUserDetailsService
 import org.codehaus.groovy.grails.plugins.springsecurity.InterceptUrlMapFilterInvocationDefinition
 import org.codehaus.groovy.grails.plugins.springsecurity.IpAddressFilter
-import org.codehaus.groovy.grails.plugins.springsecurity.LogoutFilterFactoryBean
+import org.codehaus.groovy.grails.plugins.springsecurity.MutableLogoutFilter
 import org.codehaus.groovy.grails.plugins.springsecurity.NullSaltSource
 import org.codehaus.groovy.grails.plugins.springsecurity.RequestmapFilterInvocationDefinition
 import org.codehaus.groovy.grails.plugins.springsecurity.RequestHolderAuthenticationFilter
@@ -93,18 +95,17 @@ import org.codehaus.groovy.grails.plugins.springsecurity.SecurityEventListener
 import org.codehaus.groovy.grails.plugins.springsecurity.SecurityFilterPosition
 import org.codehaus.groovy.grails.plugins.springsecurity.SecurityRequestHolder
 import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils
+import org.codehaus.groovy.grails.plugins.springsecurity.WebExpressionVoter
 
 class SpringSecurityCoreGrailsPlugin {
 
-	String version = '0.2'
-	String grailsVersion = '1.2 > *'
+	String version = '0.3'
+	String grailsVersion = '1.2.2 > *'
 	List observe = ['controllers']
 	List loadAfter = ['controllers', 'services', 'hibernate']
 
 	List pluginExcludes = [
-		'lib/easymock*.jar',
 		'grails-app/domain/**',
-		'grails-app/services/**/Test*Service.groovy',
 		'scripts/_Events.groovy',
 		'scripts/CreateTestApp.groovy',
 		'docs/**',
@@ -262,10 +263,13 @@ class SpringSecurityCoreGrailsPlugin {
 		filterInvocationInterceptor(FilterSecurityInterceptor) {
 			authenticationManager = ref('authenticationManager')
 			accessDecisionManager = ref('accessDecisionManager')
-			objectDefinitionSource = ref('objectDefinitionSource')
+			securityMetadataSource = ref('objectDefinitionSource')
 		}
 		if (conf.securityConfigType == SecurityConfigType.Annotation) {
 			objectDefinitionSource(AnnotationFilterInvocationDefinition) {
+				roleVoter = ref('roleVoter')
+				authenticatedVoter = ref('authenticatedVoter')
+				expressionHandler = ref('webExpressionHandler')
 				boolean lowercase = conf.controllerAnnotations.lowercase // true
 				if ('ant'.equals(conf.controllerAnnotations.matcher)) {
 					urlMatcher = new AntUrlPathMatcher(lowercase)
@@ -280,6 +284,9 @@ class SpringSecurityCoreGrailsPlugin {
 		}
 		else if (conf.securityConfigType == SecurityConfigType.Requestmap) {
 			objectDefinitionSource(RequestmapFilterInvocationDefinition) {
+				roleVoter = ref('roleVoter')
+				authenticatedVoter = ref('authenticatedVoter')
+				expressionHandler = ref('webExpressionHandler')
 				urlMatcher = new AntUrlPathMatcher(true)
 				if (conf.rejectIfNoRule instanceof Boolean) {
 					rejectIfNoRule = conf.rejectIfNoRule
@@ -288,6 +295,9 @@ class SpringSecurityCoreGrailsPlugin {
 		}
 		else if (conf.securityConfigType == SecurityConfigType.InterceptUrlMap) {
 			objectDefinitionSource(InterceptUrlMapFilterInvocationDefinition) {
+				roleVoter = ref('roleVoter')
+				authenticatedVoter = ref('authenticatedVoter')
+				expressionHandler = ref('webExpressionHandler')
 				urlMatcher = new AntUrlPathMatcher(true)
 				if (conf.rejectIfNoRule instanceof Boolean) {
 					rejectIfNoRule = conf.rejectIfNoRule
@@ -340,6 +350,9 @@ class SpringSecurityCoreGrailsPlugin {
 			sessionFactory = ref('sessionFactory')
 			transactionManager = ref('transactionManager')
 		}
+
+		/** authenticationUserDetailsService */
+		authenticationUserDetailsService(UserDetailsByNameServiceWrapper, ref('userDetailsService'))
 
 		// port mappings for channel security, etc.
 		portMapper(PortMapperImpl) {
@@ -550,14 +563,18 @@ class SpringSecurityCoreGrailsPlugin {
 
 		securityContextLogoutHandler(SecurityContextLogoutHandler)
 
-		// create a dummy list here, will be replaced in doWithApplicationContext
-		logoutHandlers(ArrayList, [new SecurityContextLogoutHandler()])
+		// create an initially empty list here, will be populated in doWithApplicationContext
+		logoutHandlers(ArrayList)
+
+		logoutSuccessHandler(SimpleUrlLogoutSuccessHandler) {
+			redirectStrategy = ref('redirectStrategy')
+			defaultTargetUrl = conf.logout.afterLogoutUrl // '/'
+		}
 
 		/** logoutFilter */
-		logoutFilter(LogoutFilterFactoryBean) {
-			handlers = logoutHandlers
-			logoutSuccessUrl = conf.logout.afterLogoutUrl // '/'
+		logoutFilter(MutableLogoutFilter, ref('logoutSuccessHandler')) {
 			filterProcessesUrl = conf.logout.filterProcessesUrl // '/j_spring_security_logout'
+			handlers = ref('logoutHandlers')
 		}
 	}
 
@@ -612,6 +629,14 @@ class SpringSecurityCoreGrailsPlugin {
 
 		authenticatedVoter(AuthenticatedVoter) {
 			authenticationTrustResolver = ref('authenticationTrustResolver')
+		}
+
+		webExpressionHandler(DefaultWebSecurityExpressionHandler) {
+			roleHierarchy = ref('roleHierarchy')
+		}
+
+		webExpressionVoter(WebExpressionVoter) {
+			expressionHandler = ref('webExpressionHandler')
 		}
 
 		// create the default list here, will be replaced in doWithApplicationContext
@@ -834,14 +859,10 @@ class SpringSecurityCoreGrailsPlugin {
 			subjectDnRegex = conf.x509.subjectDnRegex // CN=(.*?),
 		}
 
-		preAuthenticatedUserDetailsService(UserDetailsByNameServiceWrapper) {
-			userDetailsService = ref('userDetailsService')
-		}
-
 		userDetailsChecker(AccountStatusUserDetailsChecker)
 
 		x509AuthenticationProvider(PreAuthenticatedAuthenticationProvider) {
-			preAuthenticatedUserDetailsService = ref('preAuthenticatedUserDetailsService')
+			preAuthenticatedUserDetailsService = ref('authenticationUserDetailsService')
 			userDetailsChecker = ref('userDetailsChecker')
 			throwExceptionWhenTokenRejected = conf.x509.throwExceptionWhenTokenRejected // false
 		}

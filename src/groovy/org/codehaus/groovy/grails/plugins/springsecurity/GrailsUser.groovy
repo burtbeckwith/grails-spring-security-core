@@ -25,11 +25,11 @@ import org.springframework.security.core.userdetails.User
  */
 class GrailsUser extends User {
 
-	private final long _id
+	private final Object _id
 
 	GrailsUser(String username, String password, boolean enabled, boolean accountNonExpired,
          boolean credentialsNonExpired, boolean accountNonLocked,
-         Collection<GrantedAuthority> authorities, long id) {
+         Collection<GrantedAuthority> authorities, Object id) {
 		super(username, password, enabled, accountNonExpired, credentialsNonExpired,
 				accountNonLocked, authorities)
 		_id = id
@@ -39,5 +39,5 @@ class GrailsUser extends User {
 	 * Get the id.
 	 * @return  the id
 	 */
-	long getId() { _id }
+	Object getId() { _id }
 }
