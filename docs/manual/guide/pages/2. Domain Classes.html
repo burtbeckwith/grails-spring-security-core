@@ -1,14 +1,21 @@
-<html><head><meta content='text/html; charset=utf-8' http-equiv='Content-type'></meta><title>2. Domain Classes</title><link title='Ref' charset='utf-8' rel='stylesheet' type='text/css' href='../css/main.css' media='screen'></link></head><body><body class='body'>
-    The plugin uses regular Grails domain classes to access its required data. At a minimum you'll need a 'person' and an 'authority' domain class. In addition, if you want to store URL&lt;-&gt;Role mappings in the database (this is one of multiple approaches for defining the mappings) then you'll need a 'requestmap' domain class, and if you use the recommended approach for mapping the many-to-many relationship between 'person' and 'authority' then you'll also need a domain class to map the join table.<p class='paragraph'></p>The <a class='Scripts' href='../ref/Scripts/s2-quickstart.html'>s2-quickstart</a> script creates initial domain classes for you. You specify the package and class names, and it creates the corresponding domain classes. After that you can customize them as you like. You can add as many other fields, methods, etc. as you like, as long as the core security-related functionality remains.<p class='paragraph'></p>
+<html>
+    <head>
+        <meta http-equiv="Content-type" content="text/html; charset=utf-8"/>
+        <title>2. Domain Classes</title>
+        <link rel="stylesheet" href="../css/main.css" type="text/css" media="screen" title="Ref" charset="utf-8"/>
+    </head>
+    <body class="body">
+    The plugin uses regular Grails domain classes to access its required data. At a minimum you'll need a 'person' and an 'authority' domain class. In addition, if you want to store URL&#60;-&#62;Role mappings in the database (this is one of multiple approaches for defining the mappings) then you'll need a 'requestmap' domain class, and if you use the recommended approach for mapping the many-to-many relationship between 'person' and 'authority' then you'll also need a domain class to map the join table.<p class="paragraph"/>The <a href="../ref/Scripts/s2-quickstart.html" class="Scripts">s2-quickstart</a> script creates initial domain classes for you. You specify the package and class names, and it creates the corresponding domain classes. After that you can customize them as you like. You can add as many other fields, methods, etc. as you like, as long as the core security-related functionality remains.<p class="paragraph"/>
+    
 <script type="text/javascript">
-	var _gaq = _gaq || [];
-	_gaq.push(['_setAccount', 'UA-16219500-1']);
-	_gaq.push(['_trackPageview']);
-
-	(function() {
-		var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-		ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-		var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-	})();
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
 </script>
-</body></html>
+<script type="text/javascript">
+try{
+var pageTracker = _gat._getTracker('UA-16219500-1');
+pageTracker._trackPageview();
+} catch(err) {}
+</script>
+</body>
+</html>
