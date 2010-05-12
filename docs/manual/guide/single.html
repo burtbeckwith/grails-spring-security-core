@@ -1,6 +1,6 @@
 <html>
     <head>
-        <title>spring-security-core 0.3 - Reference Documentation</title>
+        <title>spring-security-core 0.3.1 - Reference Documentation</title>
         <link rel="stylesheet" href="../css/main.css" type="text/css" media="screen" title="Style" charset="utf-8"/>
         <link rel="stylesheet" href="../css/pdf.css" type="text/css" media="print" title="PDF" charset="utf-8" />
     </head>
@@ -16,7 +16,7 @@
             <div class="message">spring-security-core</div>
             <h1>spring-security-core - Reference Documentation</h1>
             <p><strong>Authors:</strong> Burt Beckwith</p>
-            <p><strong>Version:</strong> 0.3</p>
+            <p><strong>Version:</strong> 0.3.1</p>
             <em></em>
         </div>
 
@@ -64,6 +64,10 @@ def person = userDetails.domainClass
 person = Person.get(person.id)</pre></div><p class="paragraph"/>but then the person has essentially become a very large wrapper around its primary key since that's the real data you're storing.<p class="paragraph"/>So the approach that this plugin takes is to not store the domain class but instead store the id so you can retrieve the person easily:<p class="paragraph"/><div class="code"><pre>def userDetails = springSecurityService.principal
 person = Person.get(userDetails.id)</pre></div><p class="paragraph"/>This works because the <code>UserDetails</code> implementation is an instance of <code>org.codehaus.groovy.grails.plugins.springsecurity.GrailsUser</code> which extends the standard Spring Security <a href="http://static.springsource.org/spring-security/site/docs/3.0.x/apidocs/org/springframework/security/core/userdetails/User.html" target="blank">User</a> and adds a <code>getId()</code> method.<p class="paragraph"/>You're encouraged to further extend this class if you want to store more data along with the authentication to avoid database access - see <a href="../guide/single.html#7. Custom UserDetailsService" class="guide">Chapter 7</a> for details on this.<p class="paragraph"/><h2><a name="1.3 History">1.3 History</a></h2><h4>History</h4>
 <ul class="star">
+<li>May 12, 2010</li>
+<ul class="star">
+<li>0.3.1 release</li>
+</ul>
 <li>May 12, 2010</li>
 <ul class="star">
 <li>0.3 release</li>
