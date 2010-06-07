@@ -1,4 +1,4 @@
-This class is optionally used to store request mapping entries in the database instead of defining them with annotations or in @Config.groovy@. This has the advantage of being configurable at runtime; you can add, remove and edit rules without restarting your application.
+Optionally, you can use this class to store request mapping entries in the database instead of defining them with annotations or in @Config.groovy@. This option makes  the class configurable at runtime; you can add, remove and edit rules without restarting your application.
 
 Assuming you choose @com.mycompany.myapp@ as your package, and @Requestmap@ as your class name, you'll generate this class:
 
@@ -30,4 +30,4 @@ requestMap.urlField | 'url' | URL pattern field name
 requestMap.configAttributeField | 'configAttribute' | authority pattern field name
 {table}
 
-See [this section|guide:3.3 Requestmap] on URL mapping for details on using Requestmap entries to guard URLs.
+To use Requestmap entries to guard URLs, see [Requestmap Instances Stored in the Database|guide:3.3 Requestmap Instances Stored in the Database].

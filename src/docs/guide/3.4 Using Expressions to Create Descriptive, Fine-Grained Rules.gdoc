@@ -1,8 +1,6 @@
-Spring Security's expression support (which uses [Spring Expression Language|http://static.springsource.org/spring/docs/3.0.x/spring-framework-reference/html/expressions.html]) allows you to declare the rules for guarding URLs more descriptively than using the traditional approach, and also allows much more fine-grained rules. Where you traditionally would specify a list of role names and/or special tokens (e.g. @IS_AUTHENTICATED_FULLY@), with SpEL you can instead use the embedded scripting language to define simple or complex access rules.
+Spring Security uses the [Spring Expression Language (SpEL)|http://static.springsource.org/spring/docs/3.0.x/spring-framework-reference/html/expressions.html], which allows you to declare the rules for guarding URLs more descriptively than does the traditional approach, and also allows much more fine-grained rules. Where you traditionally would specify a list of role names and/or special tokens (for example, @IS_AUTHENTICATED_FULLY@), with [Spring Security's expression support|http://static.springsource.org/spring-security/site/docs/3.0.x/reference/el-access.html], you can instead use the embedded scripting language to define simple or complex access rules.
 
-You can read about Spring Security's expression support [here|http://static.springsource.org/spring-security/site/docs/3.0.x/reference/el-access.html].
-
-You can use expressions using any of the three approaches. For example, consider this annotated controller:
+You can use expressions with any of the previously described approaches to securing application URLs. For example, consider this annotated controller:
 
 {code}
 package com.yourcompany.yourapp
@@ -23,7 +21,7 @@ class SecureController {
 }
 {code}
 
-Here we're saying that @someAction@ requires @ROLE_ADMIN@, and @someOtherAction@ requires that the user be logged in with username 'ralph'.
+In this example, @someAction@ requires @ROLE_ADMIN@, and @someOtherAction@ requires that the user be logged in with username 'ralph'.
 
 The corresponding @Requestmap@s would be
 
@@ -44,7 +42,7 @@ grails.plugins.springsecurity.interceptUrlMap = [
 ]
 {code}
 
-The Spring Security docs have a [table listing the standard expressions|http://static.springsource.org/spring-security/site/docs/3.0.x/reference/el-access.html#el-common-built-in] which is copied here for reference:
+The Spring Security docs have a [table listing the standard expressions|http://static.springsource.org/spring-security/site/docs/3.0.x/reference/el-access.html#el-common-built-in], which is copied here for reference:
 
 {table}
 *Expression* | *Description*
@@ -60,7 +58,7 @@ The Spring Security docs have a [table listing the standard expressions|http://s
 @isFullyAuthenticated()@ | Returns true if the user is not an anonymous or a remember-me user
 {table}
 
-In addition, there is a web-specific expression @hasIpAddress@ which you can use. You may find however that it's more convenient to separate IP restrictions from role restrictions using the [IP address filter|guide:10.8. IP Address Restrictions].
+In addition, you can use a web-specific expression @hasIpAddress@. However, you may find it more convenient to separate IP restrictions from role restrictions by using the [IP address filter|guide:10.8. IP Address Restrictions].
 
 To help migrate traditional configurations to expressions, here's a table comparing various configurations and their corresponding expressions:
 
