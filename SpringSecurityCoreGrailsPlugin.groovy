@@ -20,6 +20,7 @@ import javax.servlet.Filter
 import org.springframework.cache.ehcache.EhCacheFactoryBean
 import org.springframework.cache.ehcache.EhCacheManagerFactoryBean
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl
+import org.springframework.security.access.intercept.NullRunAsManager
 import org.springframework.security.access.vote.AuthenticatedVoter
 import org.springframework.security.access.vote.RoleHierarchyVoter
 import org.springframework.security.authentication.AccountStatusUserDetailsChecker
@@ -40,6 +41,7 @@ import org.springframework.security.web.DefaultRedirectStrategy
 import org.springframework.security.web.FilterChainProxy
 import org.springframework.security.web.PortMapperImpl
 import org.springframework.security.web.PortResolverImpl
+import org.springframework.security.web.access.DefaultWebInvocationPrivilegeEvaluator
 import org.springframework.security.web.access.ExceptionTranslationFilter
 import org.springframework.security.web.access.channel.ChannelDecisionManagerImpl
 import org.springframework.security.web.access.channel.ChannelProcessingFilter
@@ -267,6 +269,7 @@ class SpringSecurityCoreGrailsPlugin {
 			authenticationManager = ref('authenticationManager')
 			accessDecisionManager = ref('accessDecisionManager')
 			securityMetadataSource = ref('objectDefinitionSource')
+			runAsManager = ref('runAsManager')
 		}
 		if (conf.securityConfigType.name() == 'Annotation') {
 			objectDefinitionSource(AnnotationFilterInvocationDefinition) {
@@ -307,6 +310,9 @@ class SpringSecurityCoreGrailsPlugin {
 				}
 			}
 		}
+
+		webInvocationPrivilegeEvaluator(DefaultWebInvocationPrivilegeEvaluator,
+				ref('filterInvocationInterceptor'))
 
 		// voters
 		configureVoters.delegate = delegate
@@ -402,6 +408,9 @@ class SpringSecurityCoreGrailsPlugin {
 				}
 			}
 		}
+
+		// per-method run-as, defined here so it can be overridden
+		runAsManager(NullRunAsManager)
 
 		// x509
 		if (conf.useX509) {
