@@ -118,7 +118,7 @@ class SpringSecurityCoreGrailsPlugin {
 		'src/docs/**'
 	]
 
-	String author = 'Burt Beckwith'
+	String author = 'Burt Beckwith, Beverley Talbott'
 	String authorEmail = 'beckwithb@vmware.com'
 	String title = 'Spring Security Core Plugin'
 	String description = 'Spring Security Core plugin'
@@ -346,6 +346,7 @@ class SpringSecurityCoreGrailsPlugin {
 			passwordEncoder = ref('passwordEncoder')
 			userCache = ref('userCache')
 			saltSource = ref('saltSource')
+			hideUserNotFoundExceptions = conf.dao.hideUserNotFoundExceptions // true
 		}
 
 		/** passwordEncoder */
