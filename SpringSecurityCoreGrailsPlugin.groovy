@@ -960,3 +960,4 @@ class SpringSecurityCoreGrailsPlugin {
 		return filters[filters.size() - 1]
 	}
 }
+
