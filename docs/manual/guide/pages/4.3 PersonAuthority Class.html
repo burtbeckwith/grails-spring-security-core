@@ -36,9 +36,9 @@ UserRole.create user, role</pre></div><p class="paragraph"/>Or by using the 3-pa
 Role role = &#8230;
 UserRole.create user, role, <span class="java&#45;keyword">true</span></pre></div><p class="paragraph"/>Revoking a role is similar:<p class="paragraph"/><div class="code"><pre>User user = &#8230;
 Role role = &#8230;
-UserRole.revoke user, role</pre></div><p class="paragraph"/>Or:<p class="paragraph"/><div class="code"><pre>User user = &#8230;
+UserRole.remove user, role</pre></div><p class="paragraph"/>Or:<p class="paragraph"/><div class="code"><pre>User user = &#8230;
 Role role = &#8230;
-UserRole.revoke user, role, <span class="java&#45;keyword">true</span></pre></div><p class="paragraph"/>The class name is the only configurable attribute:<p class="paragraph"/><table class="wiki-table" cellpadding="0" cellspacing="0" border="0"><tr><th><strong class="bold">Property</strong></th><th><strong class="bold">Default Value</strong></th><th><strong class="bold">Meaning</strong></th></tr><tr class="table-odd"><td>userLookup.authorityJoinClassName</td><td>'PersonAuthority'</td><td>User/Role many-many join class name</td></tr></table><p class="paragraph"/>
+UserRole.remove user, role, <span class="java&#45;keyword">true</span></pre></div><p class="paragraph"/>The class name is the only configurable attribute:<p class="paragraph"/><table class="wiki-table" cellpadding="0" cellspacing="0" border="0"><tr><th><strong class="bold">Property</strong></th><th><strong class="bold">Default Value</strong></th><th><strong class="bold">Meaning</strong></th></tr><tr class="table-odd"><td>userLookup.authorityJoinClassName</td><td>'PersonAuthority'</td><td>User/Role many-many join class name</td></tr></table><p class="paragraph"/>
     
 <script type="text/javascript">
 	var _gaq = _gaq || [];
