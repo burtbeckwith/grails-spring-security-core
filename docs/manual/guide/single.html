@@ -1,6 +1,6 @@
 <html>
     <head>
-        <title>Spring Security Core Plugin 0.4.2 - Reference Documentation</title>
+        <title>Spring Security Core Plugin 1.0 - Reference Documentation</title>
         <link rel="stylesheet" href="../css/main.css" type="text/css" media="screen" title="Style" charset="utf-8"/>
         <link rel="stylesheet" href="../css/pdf.css" type="text/css" media="print" title="PDF" charset="utf-8" />
     </head>
@@ -16,7 +16,7 @@
             <div class="message">spring-security-core</div>
             <h1>Spring Security Core Plugin - Reference Documentation</h1>
             <p><strong>Authors:</strong> Burt Beckwith, Beverley Talbott</p>
-            <p><strong>Version:</strong> 0.4.2</p>
+            <p><strong>Version:</strong> 1.0</p>
             <em></em>
         </div>
 
@@ -27,6 +27,10 @@
         <div id="content">
             <h1><a name="1 Introduction to the Spring Security Plugin">1 Introduction to the Spring Security Plugin</a></h1>The Spring Security plugin simplifies the integration of  <a href="http://static.springsource.org/spring-security/site/index.html" target="blank">Spring Security</a> (formerly Acegi Security) into Grails applications. The plugin provides sensible defaults with many configuration options for customization. Nearly everything is configurable or replaceable in the plugin and in Spring Security itself, which makes extensive use of interfaces.<p class="paragraph"/>This guide documents configuration defaults and describes how to configure and extend the Spring Security plug-in for Grails applications.<p class="paragraph"/><h4>Release History and Acknowledgment</h4>
 <ul class="star">
+<li>July 27, 2010</li>
+<ul class="star">
+<li>1.0 release</li>
+</ul>
 <li>July 16, 2010</li>
 <ul class="star">
 <li>0.4.2 release</li>
@@ -280,7 +284,7 @@ Renders the original user's username if the current user switched from another u
    Resume as &#60;sec:switchedUserOriginalUsername/&#62;
 &#60;/a&#62;
 &#60;/sec:ifSwitched&#62;</pre></div><p class="paragraph"/><h4>access</h4><p class="paragraph"/>Renders the body if the specified expression evaluates to <code>true</code> or specified URL is allowed.<p class="paragraph"/><div class="code"><pre>&#60;sec:access expression=<span class="java&#45;quote">"hasRole('ROLE_USER')"</span>&#62;<p class="paragraph"/>You're a user<p class="paragraph"/>&#60;/sec:access&#62;</pre></div><p class="paragraph"/><div class="code"><pre>&#60;sec:access url=<span class="java&#45;quote">"/admin/user"</span>&#62;<p class="paragraph"/>&#60;g:link controller='admin' action='user'&#62;Manage Users&#60;/g:link&#62;<p class="paragraph"/>&#60;/sec:access&#62;</pre></div><p class="paragraph"/><h4>noAccess</h4><p class="paragraph"/>Renders the body if the specified expression evaluates to <code>false</code> or URL isn't allowed.<p class="paragraph"/><div class="code"><pre>&#60;sec:noAccess expression=<span class="java&#45;quote">"hasRole('ROLE_USER')"</span>&#62;<p class="paragraph"/>You're not a user<p class="paragraph"/>&#60;/sec:noAccess&#62;</pre></div>
-<h2><a name="6.2 SpringSecurityService">6.2 SpringSecurityService</a></h2><code>grails.plugins.springsecurity.SpringSecurityService</code> provides security utility functions. It is a regular Grails service, so you can use dependency injection to inject it into a controller, service, taglib, and so on:<p class="paragraph"/><div class="code"><pre>def springSecurityService</pre></div><p class="paragraph"/><h4>isLoggedIn()</h4>
+<h2><a name="6.2 SpringSecurityService">6.2 SpringSecurityService</a></h2><code>grails.plugins.springsecurity.SpringSecurityService</code> provides security utility functions. It is a regular Grails service, so you use dependency injection to inject it into a controller, service, taglib, and so on:<p class="paragraph"/><div class="code"><pre>def springSecurityService</pre></div><p class="paragraph"/><h4>isLoggedIn()</h4>
 Checks whether there is a currently logged-in user.<p class="paragraph"/>Example:<p class="paragraph"/><div class="code"><pre>class SomeController &#123;<p class="paragraph"/>   def springSecurityService<p class="paragraph"/>   def someAction = &#123;
       <span class="java&#45;keyword">if</span> (springSecurityService.isLoggedIn()) &#123;
          &#8230;
@@ -385,7 +389,7 @@ Checks whether the request was triggered by an Ajax call. The standard way is to
 Used by dependent plugins to register an <a href="http://static.springsource.org/spring-security/site/docs/3.0.x/apidocs/org/springframework/security/authentication/AuthenticationProvider.html" target="blank">AuthenticationProvider</a> bean name.<p class="paragraph"/><h4>registerFilter()</h4>
 Used by dependent plugins to register a filter bean name in a specified position in the filter chain.<p class="paragraph"/><h4>isSwitched()</h4>
 Checks whether the current user switched from another user.<p class="paragraph"/><h4>getSwitchedUserOriginalUsername()</h4>
-Gets the original user's username if the current user switched from another user.<p class="paragraph"/><h1><a name="7 Events">7 Events</a></h1>Spring Security fires application events after various security-related actions such as successful login, unsuccessful login, and so on. Spring Security uses two main event classes, <a href="http://static.springsource.org/spring-security/site/docs/3.0.x/apidocs/org/springframework/security/authentication/event/AbstractAuthenticationEvent.html" target="blank">AbstractAuthenticationEvent</a> and <a href="http://static.springsource.org/spring-security/site/docs/3.0.x/apidocs/org/springframework/security/access/event/AbstractAuthorizationEvent.html" target="blank">AbstractAuthorizationEvent</a>.<p class="paragraph"/><p class="paragraph"/><h2><a name="7.1 Event Notification">7.1 Event Notification</a></h2>You can set up event notifications in two ways. The sections that follow describe each approach in more detail.
+Gets the original user's username if the current user switched from another user.<p class="paragraph"/><h4>doWithAuth()</h4><p class="paragraph"/>Executes a Closure with the current authentication. The one-parameter version which takes just a Closure assumes that there's an authentication in the HTTP Session and that the Closure is running in a separate thread from the web request, so the <code>SecurityContext</code> and <code>Authentication</code> aren't available to the standard <code>ThreadLocal</code>. This is primarily of use when you explicitly launch a new thread from a controller action or service called in request scope, not from a Quartz job which isn't associated with an authentication in any thread.<p class="paragraph"/>The two-parameter version takes a Closure and a username to authenticate as. This is will authenticate as the specified user and execute the closure with that authentication. It restores the authentication to the one that was active if it exists, or clears the context otherwise. This is similar to run-as and switch-user but is only local to the Closure.<p class="paragraph"/><h1><a name="7 Events">7 Events</a></h1>Spring Security fires application events after various security-related actions such as successful login, unsuccessful login, and so on. Spring Security uses two main event classes, <a href="http://static.springsource.org/spring-security/site/docs/3.0.x/apidocs/org/springframework/security/authentication/event/AbstractAuthenticationEvent.html" target="blank">AbstractAuthenticationEvent</a> and <a href="http://static.springsource.org/spring-security/site/docs/3.0.x/apidocs/org/springframework/security/access/event/AbstractAuthorizationEvent.html" target="blank">AbstractAuthorizationEvent</a>.<p class="paragraph"/><p class="paragraph"/><h2><a name="7.1 Event Notification">7.1 Event Notification</a></h2>You can set up event notifications in two ways. The sections that follow describe each approach in more detail.
 <ul class="star">
 <li>Register an event listener, ignoring events that do not interest you. Spring allows only partial event subscription; you use generics to register the class of events that interest you, and you are notified of that class and all subclasses.</li>
 <li>Register one or more callback closures in <code>grails-app/conf/Config.groovy</code> that take advantage of the plugin's <code>org.codehaus.groovy.grails.plugins.springsecurity.SecurityEventListener</code>. The listener does the filtering for you.</li>

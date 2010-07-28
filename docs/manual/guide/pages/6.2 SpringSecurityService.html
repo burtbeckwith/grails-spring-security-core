@@ -5,7 +5,7 @@
         <link rel="stylesheet" href="../css/main.css" type="text/css" media="screen" title="Ref" charset="utf-8"/>
     </head>
     <body class="body">
-    <code>grails.plugins.springsecurity.SpringSecurityService</code> provides security utility functions. It is a regular Grails service, so you can use dependency injection to inject it into a controller, service, taglib, and so on:<p class="paragraph"/><div class="code"><pre>def springSecurityService</pre></div><p class="paragraph"/><h4>isLoggedIn()</h4>
+    <code>grails.plugins.springsecurity.SpringSecurityService</code> provides security utility functions. It is a regular Grails service, so you use dependency injection to inject it into a controller, service, taglib, and so on:<p class="paragraph"/><div class="code"><pre>def springSecurityService</pre></div><p class="paragraph"/><h4>isLoggedIn()</h4>
 Checks whether there is a currently logged-in user.<p class="paragraph"/>Example:<p class="paragraph"/><div class="code"><pre>class SomeController &#123;<p class="paragraph"/>   def springSecurityService<p class="paragraph"/>   def someAction = &#123;
       <span class="java&#45;keyword">if</span> (springSecurityService.isLoggedIn()) &#123;
          &#8230;
