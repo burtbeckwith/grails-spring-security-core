@@ -42,9 +42,6 @@ grails.plugins.springsecurity.authority.className = 'com.yourcompany.yourapp.Rol
 <li>tag names now start with 'if' instead of 'is', and the <code>role</code> attribute changed to <code>roles</code>, so for example change <code>&#60;g:ifAnyGranted role='...'&#62;</code> to <code>&#60;sec:ifAnyGranted roles='...'&#62;</code></li>
 <li>use <code>&#60;sec:username/&#62;</code> instead of <code>&#60;g:loggedInUserInfo(field:'username')}/&#62;</code> - use <code>&#60;sec:loggedInUserInfo&#62;</code> to render other <code>GrailsUser</code> attributes</li>
 </ul><p class="paragraph"/>See more details about the taglibs in <a href="../guide/single.html#6 Helper Classes" class="guide">Section 6</a>.
-<ul class="star">
-<li>Replace @Secured('ROLE_ANONYMOUS') with</li>
-</ul><p class="paragraph"/>@Secured('IS_AUTHENTICATED_ANONYMOUSLY')<p class="paragraph"/>
 
     
 <script type="text/javascript">
