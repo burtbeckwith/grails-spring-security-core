@@ -26,25 +26,14 @@
 	<macrodef name='grails'>
 		<attribute name='action' />
 		<attribute name='environment' default='dev' />
+		<element name='preargs' optional='true' />
 		<element name='args' optional='true' />
 		<sequential>
 			<exec executable='${grails}' failonerror='true'>
-				<args />
+				<preargs />
 				<arg value='@{environment}'/>
 				<arg value='@{action}'/>
-			</exec>
-		</sequential>
-	</macrodef>
-
-	<macrodef name='grails-debug'>
-		<attribute name='action' />
-		<attribute name='environment' default='dev' />
-		<element name='args' optional='true' />
-		<sequential>
-			<exec executable='${grails-debug}' failonerror='true'>
 				<args />
-				<arg value='@{environment}'/>
-				<arg value='@{action}'/>
 			</exec>
 		</sequential>
 	</macrodef>
@@ -61,7 +50,15 @@
 	</target>
 
 	<target name='doc' description='Generates docs' depends='init'>
-		<grails action='doc' />
+
+		<grails action='doc'>
+			<args><arg value='--pdf'/></args>
+		</grails>
+
+		<grails action='add-tracking'/>
+
+		<delete dir='docs/api'/>
+		<delete dir='docs/gapi'/>
 	</target>
 
 	<target name='test' description='Run unit tests' depends='clean'>

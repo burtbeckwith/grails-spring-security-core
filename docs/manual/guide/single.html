@@ -618,17 +618,19 @@ Event.observe(window, 'load', function() &#123;
       <span class="java&#45;keyword">super</span>(username, password, enabled, accountNonExpired,
             credentialsNonExpired, accountNonLocked, authorities, id)<p class="paragraph"/>      <span class="java&#45;keyword">this</span>.fullName = fullName
    &#125;
-&#125;</pre></div><p class="paragraph"/><div class="code"><pre><span class="java&#45;keyword">package</span> com.mycompany.myapp<p class="paragraph"/><span class="java&#45;keyword">import</span> org.springframework.security.core.authority.GrantedAuthorityImpl
+&#125;</pre></div><p class="paragraph"/><div class="code"><pre><span class="java&#45;keyword">package</span> com.mycompany.myapp<p class="paragraph"/><span class="java&#45;keyword">import</span> org.codehaus.groovy.grails.plugins.springsecurity.GrailsUser
+<span class="java&#45;keyword">import</span> org.codehaus.groovy.grails.plugins.springsecurity.GrailsUserDetailsService
+<span class="java&#45;keyword">import</span> org.springframework.security.core.authority.GrantedAuthorityImpl
 <span class="java&#45;keyword">import</span> org.springframework.security.core.userdetails.UserDetails
-<span class="java&#45;keyword">import</span> org.springframework.security.core.userdetails.UserDetailsService<p class="paragraph"/>class MyUserDetailsService <span class="java&#45;keyword">implements</span> GrailsUserDetailsService &#123;<p class="paragraph"/>   UserDetails loadUserByUsername(<span class="java&#45;object">String</span> username, <span class="java&#45;object">boolean</span> loadRoles)
+<span class="java&#45;keyword">import</span> org.springframework.security.core.userdetails.UsernameNotFoundException<p class="paragraph"/>class MyUserDetailsService <span class="java&#45;keyword">implements</span> GrailsUserDetailsService &#123;<p class="paragraph"/>   UserDetails loadUserByUsername(<span class="java&#45;object">String</span> username, <span class="java&#45;object">boolean</span> loadRoles)
             <span class="java&#45;keyword">throws</span> UsernameNotFoundException &#123;
       <span class="java&#45;keyword">return</span> loadUserByUsername(username)
-   &#125;<p class="paragraph"/>   UserDetails loadUserByUsername(<span class="java&#45;object">String</span> username) <span class="java&#45;keyword">throws</span> UsernameNotFoundException &#123;<p class="paragraph"/>      User.withTransaction &#123; status &#45;&#62;<p class="paragraph"/>         User user = User.findByUsername(username) 
-         <span class="java&#45;keyword">if</span> (!user) <span class="java&#45;keyword">throw</span> <span class="java&#45;keyword">new</span> UsernameNotFoundException('User not found', username)<p class="paragraph"/>         def authorities = user.authorities.collect &#123; <span class="java&#45;keyword">new</span> GrantedAuthorityImpl(it.authority) &#125;<p class="paragraph"/>         <span class="java&#45;keyword">return</span> <span class="java&#45;keyword">new</span> MyUserDetails(user.username, user.password, user.enabled, 
-            !user.accountExpired, !user.passwordExpired, 
-            !user.accountLocked, authorities, user.id, 
-            user.firstName + <span class="java&#45;quote">" "</span> + user.lastName) 
-      &#125; 
+   &#125;<p class="paragraph"/>   UserDetails loadUserByUsername(<span class="java&#45;object">String</span> username) <span class="java&#45;keyword">throws</span> UsernameNotFoundException &#123;<p class="paragraph"/>      User.withTransaction &#123; status &#45;&#62;<p class="paragraph"/>         User user = User.findByUsername(username)
+         <span class="java&#45;keyword">if</span> (!user) <span class="java&#45;keyword">throw</span> <span class="java&#45;keyword">new</span> UsernameNotFoundException('User not found', username)<p class="paragraph"/>         def authorities = user.authorities.collect &#123; <span class="java&#45;keyword">new</span> GrantedAuthorityImpl(it.authority) &#125;<p class="paragraph"/>         <span class="java&#45;keyword">return</span> <span class="java&#45;keyword">new</span> MyUserDetails(user.username, user.password, user.enabled,
+            !user.accountExpired, !user.passwordExpired,
+            !user.accountLocked, authorities, user.id,
+            user.firstName + <span class="java&#45;quote">" "</span> + user.lastName)
+      &#125;
    &#125;
 &#125;</pre></div><p class="paragraph"/>The lookup code is wrapped in a <code>withTransaction</code> block to avoid lazy loading exceptions when accessing the <code>authorities</code> collection. There are obviously no database updates here but this is a convenient way to keep the Hibernate <code>Session</code> open to enable accessing the roles.<p class="paragraph"/>To use your implementation, register it in <code>grails-app/conf/spring/resources.groovy</code> like this:<p class="paragraph"/><div class="code"><pre>beans = &#123;
    userDetailsService(com.mycompany.myapp.MyUserDetailsService)
