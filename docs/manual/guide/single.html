@@ -622,13 +622,18 @@ Event.observe(window, 'load', function() &#123;
 <span class="java&#45;keyword">import</span> org.codehaus.groovy.grails.plugins.springsecurity.GrailsUserDetailsService
 <span class="java&#45;keyword">import</span> org.springframework.security.core.authority.GrantedAuthorityImpl
 <span class="java&#45;keyword">import</span> org.springframework.security.core.userdetails.UserDetails
-<span class="java&#45;keyword">import</span> org.springframework.security.core.userdetails.UsernameNotFoundException<p class="paragraph"/>class MyUserDetailsService <span class="java&#45;keyword">implements</span> GrailsUserDetailsService &#123;<p class="paragraph"/>   UserDetails loadUserByUsername(<span class="java&#45;object">String</span> username, <span class="java&#45;object">boolean</span> loadRoles)
+<span class="java&#45;keyword">import</span> org.springframework.security.core.userdetails.UsernameNotFoundException<p class="paragraph"/>class MyUserDetailsService <span class="java&#45;keyword">implements</span> GrailsUserDetailsService &#123;<p class="paragraph"/>   /&#42;&#42;
+    &#42; Some Spring Security classes (e.g. RoleHierarchyVoter) expect at least one role, so
+    &#42; we give a user with no granted roles <span class="java&#45;keyword">this</span> one which gets past that restriction but
+    &#42; doesn't grant anything.
+    &#42;/
+   <span class="java&#45;keyword">static</span> <span class="java&#45;keyword">final</span> List NO_ROLES = &#91;<span class="java&#45;keyword">new</span> GrantedAuthorityImpl(SpringSecurityUtils.NO_ROLE)&#93;<p class="paragraph"/>   UserDetails loadUserByUsername(<span class="java&#45;object">String</span> username, <span class="java&#45;object">boolean</span> loadRoles)
             <span class="java&#45;keyword">throws</span> UsernameNotFoundException &#123;
       <span class="java&#45;keyword">return</span> loadUserByUsername(username)
    &#125;<p class="paragraph"/>   UserDetails loadUserByUsername(<span class="java&#45;object">String</span> username) <span class="java&#45;keyword">throws</span> UsernameNotFoundException &#123;<p class="paragraph"/>      User.withTransaction &#123; status &#45;&#62;<p class="paragraph"/>         User user = User.findByUsername(username)
-         <span class="java&#45;keyword">if</span> (!user) <span class="java&#45;keyword">throw</span> <span class="java&#45;keyword">new</span> UsernameNotFoundException('User not found', username)<p class="paragraph"/>         def authorities = user.authorities.collect &#123; <span class="java&#45;keyword">new</span> GrantedAuthorityImpl(it.authority) &#125;<p class="paragraph"/>         <span class="java&#45;keyword">return</span> <span class="java&#45;keyword">new</span> MyUserDetails(user.username, user.password, user.enabled,
+         <span class="java&#45;keyword">if</span> (!user) <span class="java&#45;keyword">throw</span> <span class="java&#45;keyword">new</span> UsernameNotFoundException('User not found', username)<p class="paragraph"/>         def authorities = user.authorities.collect &#123;<span class="java&#45;keyword">new</span> GrantedAuthorityImpl(it.authority)&#125;<p class="paragraph"/>         <span class="java&#45;keyword">return</span> <span class="java&#45;keyword">new</span> MyUserDetails(user.username, user.password, user.enabled,
             !user.accountExpired, !user.passwordExpired,
-            !user.accountLocked, authorities, user.id,
+            !user.accountLocked, authorities ?: NO_ROLES, user.id,
             user.firstName + <span class="java&#45;quote">" "</span> + user.lastName)
       &#125;
    &#125;
