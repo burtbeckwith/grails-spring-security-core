@@ -18,6 +18,7 @@ import javax.servlet.Filter
 
 import org.springframework.cache.ehcache.EhCacheFactoryBean
 import org.springframework.cache.ehcache.EhCacheManagerFactoryBean
+import org.springframework.security.access.event.LoggerListener
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl
 import org.springframework.security.access.intercept.NullRunAsManager
 import org.springframework.security.access.vote.AuthenticatedVoter
@@ -591,8 +592,23 @@ class SpringSecurityCoreGrailsPlugin {
 	}
 
 	private void addControllerMethods(MetaClass mc, ctx) {
-		mc.getPrincipal = { -> SCH.context?.authentication?.principal }
-		mc.isLoggedIn = { -> ctx.springSecurityService.isLoggedIn() }
+
+		if (!mc.respondsTo(null, 'getPrincipal')) {
+			mc.getPrincipal = { -> SCH.context?.authentication?.principal }
+		}
+
+		if (!mc.respondsTo(null, 'isLoggedIn')) {
+			mc.isLoggedIn = { -> ctx.springSecurityService.isLoggedIn() }
+		}
+
+		if (!mc.respondsTo(null, 'getAuthenticatedUser')) {
+			mc.getAuthenticatedUser = { ->
+				if (!ctx.springSecurityService.isLoggedIn()) return null
+				String userClassName = SpringSecurityUtils.securityConfig.userLookup.userDomainClassName
+				Class User = ctx.grailsApplication.getDomainClass(userClassName).clazz
+				User.get SCH.context.authentication.principal.id
+			}
+		}
 	}
 
 	private createRefList = { names -> names.collect { name -> ref(name) } }
