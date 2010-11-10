@@ -5,13 +5,13 @@
         <link rel="stylesheet" href="../css/main.css" type="text/css" media="screen" title="Ref" charset="utf-8"/>
     </head>
     <body class="body">
-    Create one or more Groovy or Java classes, for example:<p class="paragraph"/><div class="code"><pre><span class="java&#45;keyword">package</span> com.foo.bar<p class="paragraph"/><span class="java&#45;keyword">import</span> org.springframework.context.ApplicationListener
+    Enable events with <code>grails.plugins.springsecurity.useSecurityEventListener = true</code> and create one or more Groovy or Java classes, for example:<p class="paragraph"/><div class="code"><pre><span class="java&#45;keyword">package</span> com.foo.bar<p class="paragraph"/><span class="java&#45;keyword">import</span> org.springframework.context.ApplicationListener
 <span class="java&#45;keyword">import</span> org.springframework.security.authentication.event.AuthenticationSuccessEvent<p class="paragraph"/>class MySecurityEventListener <span class="java&#45;keyword">implements</span> ApplicationListener&#60;AuthenticationSuccessEvent&#62; &#123;<p class="paragraph"/>   void onApplicationEvent(AuthenticationSuccessEvent event) &#123;
       // handle the event
    &#125;
-&#125;</pre></div><p class="paragraph"/>Register the class in <code>grails-app/conf/spring/resources.groovy</code>:<p class="paragraph"/><div class="code"><pre>beans = &#123;
-   mySecurityEventListener(com.foo.bar.MySecurityEventListener)
-&#125;</pre></div><p class="paragraph"/><p class="paragraph"/>
+&#125;</pre></div><p class="paragraph"/>Register the class in <code>grails-app/conf/spring/resources.groovy</code>:<p class="paragraph"/><div class="code"><pre><span class="java&#45;keyword">import</span> com.foo.bar.MySecurityEventListener<p class="paragraph"/>beans = &#123;
+   mySecurityEventListener(MySecurityEventListener)
+&#125;</pre></div><p class="paragraph"/>
     
 <script type="text/javascript">
 	var _gaq = _gaq || [];
