@@ -29,18 +29,24 @@ USAGE = """
 target(s2CreatePersistentToken: 'Creates the persistent token domain class for the Spring Security Core plugin') {
 	depends(checkVersion, configureProxy, packageApp, classpath)
 
-	configure()
+	if (!configure()) {
+		return
+	}
 	createDomainClass()
 	updateConfig()
 }
 
-private void configure() {
+private boolean configure() {
 
 	fullClassName = parseArgs()
+	if (!fullClassName) {
+		return false
+	}
+
 	String packageName
 	String className
 	(packageName, className) = splitClassName(fullClassName)
-	
+
 	String packageDeclaration = ''
 	if (packageName) {
 		packageDeclaration = "package $packageName"
@@ -49,6 +55,8 @@ private void configure() {
 	templateAttributes = [packageName: packageName,
 	                      packageDeclaration: packageDeclaration,
 	                      className: className]
+
+	true
 }
 
 private void createDomainClass() {
@@ -68,16 +76,15 @@ private void updateConfig() {
 }
 
 private parseArgs() {
-	args = args ? args.split('\n') : []
-	switch (args.size()) {
-		case 1:
-			ant.echo message: "Creating persistent token class ${args[0]}"
-			return args[0]
-		default:
-			ant.echo message: USAGE
-			System.exit 1
-			break
+	def args = argsMap.params
+
+	if (1 == args.size()) {
+		printMessage "Creating persistent token class ${args[0]}"
+		return args[0]
 	}
+
+	errorMessage message: USAGE
+	null
 }
 
 setDefaultTarget 's2CreatePersistentToken'

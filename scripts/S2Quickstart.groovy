@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 import grails.util.GrailsNameUtils
+import grails.util.Metadata
 
 includeTargets << new File("$springSecurityCorePluginDir/scripts/_S2Common.groovy")
 
@@ -35,12 +36,14 @@ requestmapClassName = ''
 target(s2Quickstart: 'Creates artifacts for the Spring Security plugin') {
 	depends(checkVersion, configureProxy, packageApp, classpath)
 
-	configure()
+	if (!configure()) {
+		return
+	}
 	createDomains()
 	copyControllersAndViews()
 	updateConfig()
 
-	ant.echo """
+	printMessage """
 *******************************************************
 * Created domain classes, controllers, and GSPs. Your *
 * grails-app/conf/Config.groovy has been updated with *
@@ -50,9 +53,13 @@ target(s2Quickstart: 'Creates artifacts for the Spring Security plugin') {
 """
 }
 
-private void configure() {
+private boolean configure() {
 
 	def argValues = parseArgs()
+	if (!argValues) {
+		return false
+	}
+
 	if (argValues.size() == 4) {
 		(packageName, userClassName, roleClassName, requestmapClassName) = argValues
 	}
@@ -66,6 +73,49 @@ private void configure() {
 	                      roleClassName: roleClassName,
 	                      roleClassProperty: GrailsNameUtils.getPropertyName(roleClassName),
 	                      requestmapClassName: requestmapClassName]
+
+	if (Metadata.current.getGrailsVersion().startsWith('1.2')) {
+		templateAttributes.dependencyInjections = '''\
+	transient springSecurityService
+	transient grailsApplication
+	transient sessionFactory
+'''
+		templateAttributes.dirtyMethods = '''
+
+	private boolean isDirty(String fieldName) {
+		def session = sessionFactory.currentSession
+		def entry = findEntityEntry(session)
+		if (!entry) {
+			return false
+		}
+
+		Object[] values = entry.persister.getPropertyValues(this, session.entityMode)
+		int[] dirtyProperties = entry.persister.findDirty(values, entry.loadedState, this, session)
+		int fieldIndex = entry.persister.propertyNames.findIndexOf { fieldName == it }
+		return fieldIndex in dirtyProperties
+	}
+
+	private findEntityEntry(session) {
+		def entry = session.persistenceContext.getEntry(this)
+		if (!entry) {
+			return null
+		}
+
+		if (!entry.requiresDirtyCheck(this) && entry.loadedState) {
+			return null
+		}
+
+		entry
+	}'''
+	}
+	else {
+		templateAttributes.dependencyInjections = '''\
+	transient springSecurityService
+'''
+		templateAttributes.dirtyMethods = ''
+	}
+
+	true
 }
 
 private void createDomains() {
@@ -105,19 +155,20 @@ private void updateConfig() {
 }
 
 private parseArgs() {
-	args = args ? args.split('\n') : []
-	switch (args.size()) {
-		case 3:
-			ant.echo message: "Creating User class ${args[1]} and Role class ${args[2]} in package ${args[0]}"
-			return args
-		case 4:
-			ant.echo message: "Creating User class ${args[1]}, Role class ${args[2]}, and Requestmap class ${args[3]} in package ${args[0]}"
-			return args
-		default:
-			ant.echo message: USAGE
-			System.exit(1)
-			break
+	def args = argsMap.params
+
+	if (3 == args.size()) {
+		printMessage "Creating User class ${args[1]} and Role class ${args[2]} in package ${args[0]}"
+		return args
 	}
+
+	if (4 == args.size()) {
+		printMessage "Creating User class ${args[1]}, Role class ${args[2]}, and Requestmap class ${args[3]} in package ${args[0]}"
+		return args
+	}
+
+	errorMessage USAGE
+	null
 }
 
 setDefaultTarget 's2Quickstart'

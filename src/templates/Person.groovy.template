@@ -2,6 +2,7 @@ package ${packageName}
 
 class ${userClassName} {
 
+${dependencyInjections}
 	String username
 	String password
 	boolean enabled
@@ -21,4 +22,18 @@ class ${userClassName} {
 	Set<${roleClassName}> getAuthorities() {
 		${userClassName}${roleClassName}.findAllBy${userClassName}(this).collect { it.${roleClassProperty} } as Set
 	}
+
+	def beforeInsert() {
+		encodePassword()
+	}
+
+	def beforeUpdate() {
+		if (isDirty('password')) {
+			encodePassword()
+		}
+	}
+
+	protected void encodePassword() {
+		password = springSecurityService.encodePassword(password)
+	}${dirtyMethods}
 }

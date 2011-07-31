@@ -14,11 +14,13 @@
  */
 package org.codehaus.groovy.grails.plugins.springsecurity;
 
+import grails.util.GrailsUtil;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -51,7 +53,7 @@ public abstract class AbstractFilterInvocationDefinition
 	private AuthenticatedVoter _authenticatedVoter;
 	private WebSecurityExpressionHandler _expressionHandler;
 
-	private final Map<Object, Collection<ConfigAttribute>> _compiled = new HashMap<Object, Collection<ConfigAttribute>>();
+	private final Map<Object, Collection<ConfigAttribute>> _compiled = new LinkedHashMap<Object, Collection<ConfigAttribute>>();
 
 	protected final Logger _log = Logger.getLogger(getClass());
 
@@ -94,6 +96,10 @@ public abstract class AbstractFilterInvocationDefinition
 
 	protected abstract String determineUrl(FilterInvocation filterInvocation);
 
+	protected boolean stopAtFirstMatch() {
+		return false;
+	}
+
 	private Collection<ConfigAttribute> findConfigAttributes(final String url) throws Exception {
 
 		initialize();
@@ -101,6 +107,7 @@ public abstract class AbstractFilterInvocationDefinition
 		Collection<ConfigAttribute> configAttributes = null;
 		Object configAttributePattern = null;
 
+		boolean stopAtFirstMatch = stopAtFirstMatch();
 		for (Map.Entry<Object, Collection<ConfigAttribute>> entry : _compiled.entrySet()) {
 			Object pattern = entry.getKey();
 			if (_urlMatcher.pathMatchesUrl(pattern, url)) {
@@ -111,6 +118,9 @@ public abstract class AbstractFilterInvocationDefinition
 					if (_log.isTraceEnabled()) {
 						_log.trace("new candidate for '" + url + "': '" + pattern
 								+ "':" + configAttributes);
+					}
+					if (stopAtFirstMatch) {
+						break;
 					}
 				}
 			}
@@ -145,6 +155,14 @@ public abstract class AbstractFilterInvocationDefinition
 	 * @see org.springframework.security.access.SecurityMetadataSource#getAllConfigAttributes()
 	 */
 	public Collection<ConfigAttribute> getAllConfigAttributes() {
+		try {
+			initialize();
+		}
+		catch (Exception e) {
+			GrailsUtil.deepSanitize(e);
+			_log.error(e.getMessage(), e);
+		}
+
 		Collection<ConfigAttribute> all = new HashSet<ConfigAttribute>();
 		for (Collection<ConfigAttribute> configs : _compiled.values()) {
 			all.addAll(configs);
@@ -154,7 +172,7 @@ public abstract class AbstractFilterInvocationDefinition
 
 	/**
 	 * Dependency injection for the url matcher.
-	 * @param urlMatcher  the matcher
+	 * @param urlMatcher the matcher
 	 */
 	public void setUrlMatcher(final UrlMatcher urlMatcher) {
 		_urlMatcher = urlMatcher;
@@ -163,7 +181,7 @@ public abstract class AbstractFilterInvocationDefinition
 
 	/**
 	 * Dependency injection for whether to reject if there's no matching rule.
-	 * @param reject  if true, reject access unless there's a pattern for the specified resource
+	 * @param reject if true, reject access unless there's a pattern for the specified resource
 	 */
 	public void setRejectIfNoRule(final boolean reject) {
 		_rejectIfNoRule = reject;
@@ -267,8 +285,8 @@ public abstract class AbstractFilterInvocationDefinition
 
 	/**
 	 * For admin/debugging - find all config attributes that apply to the specified URL.
-	 * @param url  the URL
-	 * @return  matching attributes
+	 * @param url the URL
+	 * @return matching attributes
 	 */
 	public Collection<ConfigAttribute> findMatchingAttributes(final String url) {
 		for (Map.Entry<Object, Collection<ConfigAttribute>> entry : _compiled.entrySet()) {
@@ -281,7 +299,7 @@ public abstract class AbstractFilterInvocationDefinition
 
 	/**
 	 * Dependency injection for the role voter.
-	 * @param voter  the voter
+	 * @param voter the voter
 	 */
 	public void setRoleVoter(final RoleVoter voter) {
 		_roleVoter = voter;
@@ -293,7 +311,7 @@ public abstract class AbstractFilterInvocationDefinition
 
 	/**
 	 * Dependency injection for the authenticated voter.
-	 * @param voter  the voter
+	 * @param voter the voter
 	 */
 	public void setAuthenticatedVoter(final AuthenticatedVoter voter) {
 		_authenticatedVoter = voter;
@@ -304,7 +322,7 @@ public abstract class AbstractFilterInvocationDefinition
 
 	/**
 	 * Dependency injection for the expression handler.
-	 * @param handler  the handler
+	 * @param handler the handler
 	 */
 	public void setExpressionHandler(final WebSecurityExpressionHandler handler) {
 		_expressionHandler = handler;

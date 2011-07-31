@@ -5,7 +5,7 @@ h2. Purpose
 Creates a user and role class (and optionally a requestmap class) in the specified package. The general format is:
 
 bc.
-   grails s2-quickstart DOMAIN_CLASS_PACKAGE USER_CLASS_NAME ROLE_CLASS_NAME \[REQUESTMAP_CLASS_NAME\]
+grails s2-quickstart DOMAIN_CLASS_PACKAGE USER_CLASS_NAME ROLE_CLASS_NAME \[REQUESTMAP_CLASS_NAME\]
 
 h2. Examples
 
@@ -23,4 +23,3 @@ h2. Description
 ** @grails-app/views/login/denied.gsp@ - shows a 403 error page
 ** @grails-app/controllers/LoginController.groovy@ - manages login workflow
 ** @grails-app/controllers/LogoutController.groovy@ - logs users out of the application
-
