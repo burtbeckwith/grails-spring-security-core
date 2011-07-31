@@ -11,7 +11,8 @@
    '/pattern3/&#42;&#42;': &#91;'10.10.200.42', '10.10.200.63'&#93;
 &#93;</pre></div><p class="paragraph"/><code>pattern1</code> URLs can be accessed only from the external address 123.234.345.456, <code>pattern2</code> URLs can be accessed only from a 10.xxx.xxx.xxx intranet address, and <code>pattern3</code> URLs can be accessed only from 10.10.200.42 or 10.10.200.63. All other URL patterns are accessible from any IP address.<p class="paragraph"/>All addresses can always be accessed from localhost regardless of IP pattern, primarily to support local development mode.<p class="paragraph"/><blockquote class="note">
 You cannot compare IPv4 and IPv6 addresses, so if your server supports both, you need to specify the IP patterns using the address format that is actually being used. Otherwise the filter throws exceptions. One option is to set the <code>java.net.preferIPv4Stack</code> system property, for example, by adding it to <code>JAVA_OPTS</code> or <code>GRAILS_OPTS</code> as <code>-Djava.net.preferIPv4Stack=true</code>.
-</blockquote><p class="paragraph"/>
+</blockquote>
+
     
 <script type="text/javascript">
 	var _gaq = _gaq || [];

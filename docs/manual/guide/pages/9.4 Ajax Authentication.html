@@ -178,7 +178,8 @@ Event.observe(window, 'load', function() &#123;
 &#60;/g:form&#62;</pre></div><p class="paragraph"/>Most of the attributes are typical, but the <code>on401</code> attribute is the key to making Ajax logins work. As long as the <code>LoginController</code> sends a 401 error code the need to authenticate can be easily handled.<p class="paragraph"/>Note that depending on the version of the plugin that you're using, you may need to add the <code>authAjax</code> method to your <code>LoginController</code>:<p class="paragraph"/><div class="code"><pre>def authAjax = &#123;
    response.setHeader 'Location', SpringSecurityUtils.securityConfig.auth.ajaxLoginFormUrl
    response.sendError HttpServletResponse.SC_UNAUTHORIZED
-&#125;</pre></div><p class="paragraph"/>and this requires an import for <code>javax.servlet.http.HttpServletResponse</code>.<p class="paragraph"/>
+&#125;</pre></div><p class="paragraph"/>and this requires an import for <code>javax.servlet.http.HttpServletResponse</code>.
+
     
 <script type="text/javascript">
 	var _gaq = _gaq || [];

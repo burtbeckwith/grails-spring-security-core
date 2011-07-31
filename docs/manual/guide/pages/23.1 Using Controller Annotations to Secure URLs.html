@@ -5,15 +5,14 @@
         <link rel="stylesheet" href="../css/main.css" type="text/css" media="screen" title="Ref" charset="utf-8"/>
     </head>
     <body class="body">
-    
-<h4>1. Create your Grails application.</h4><p class="paragraph"/><div class="code"><pre>$ grails create&#45;app bookstore
+    <h4>1. Create your Grails application.</h4><p class="paragraph"/><div class="code"><pre>$ grails create&#45;app bookstore
 $ cd bookstore</pre></div>
 <h4>2. Install the plugin.</h4>
 <div class="code"><pre>$ grails install&#45;plugin spring&#45;security&#45;core</pre></div>
 <h4>3. Create the User and Role domain classes.</h4>
 <div class="code"><pre>$ grails s2&#45;quickstart com.testapp User Role</pre></div><p class="paragraph"/>You can choose your names for your domain classes and package; these are just examples.<p class="paragraph"/><blockquote class="note">
 Depending on your database, some domain class names might not be valid, especially those relating to security. Before you create names like "User" or "Group", make sure they are not reserved keywords in your database.
-</blockquote><p class="paragraph"/>The script creates this User class:<p class="paragraph"/><div class="code"><pre><span class="java&#45;keyword">package</span> com.testapp<p class="paragraph"/>class User &#123;<p class="paragraph"/>   <span class="java&#45;object">String</span> username
+</blockquote><p class="paragraph"/>The script creates this User class:<p class="paragraph"/><div class="code"><pre><span class="java&#45;keyword">package</span> com.testapp<p class="paragraph"/><span class="java&#45;keyword">package</span> test<p class="paragraph"/>class User &#123;<p class="paragraph"/>   <span class="java&#45;keyword">transient</span> springSecurityService<p class="paragraph"/>   <span class="java&#45;object">String</span> username
    <span class="java&#45;object">String</span> password
    <span class="java&#45;object">boolean</span> enabled
    <span class="java&#45;object">boolean</span> accountExpired
@@ -25,8 +24,18 @@ Depending on your database, some domain class names might not be valid, especial
       password column: '`password`'
    &#125;<p class="paragraph"/>   Set&#60;Role&#62; getAuthorities() &#123;
       UserRole.findAllByUser(<span class="java&#45;keyword">this</span>).collect &#123; it.role &#125; as Set
+   &#125;<p class="paragraph"/>   def beforeInsert() &#123;
+      encodePassword()
+   &#125;<p class="paragraph"/>   def beforeUpdate() &#123;
+      <span class="java&#45;keyword">if</span> (isDirty('password')) &#123;
+         encodePassword()
+      &#125;
+   &#125;<p class="paragraph"/>   <span class="java&#45;keyword">protected</span> void encodePassword() &#123;
+      password = springSecurityService.encodePassword(password)
    &#125;
-&#125;</pre></div><p class="paragraph"/>and this Role class:<p class="paragraph"/><div class="code"><pre><span class="java&#45;keyword">package</span> com.testapp<p class="paragraph"/>class Role &#123;<p class="paragraph"/>   <span class="java&#45;object">String</span> authority<p class="paragraph"/>   <span class="java&#45;keyword">static</span> mapping = &#123;
+&#125;</pre></div><p class="paragraph"/><blockquote class="note">
+Earlier versions of the plugin didn't include password encryption logic in the domain class, but it makes the code a lot cleaner.
+</blockquote><p class="paragraph"/>and this Role class:<p class="paragraph"/><div class="code"><pre><span class="java&#45;keyword">package</span> com.testapp<p class="paragraph"/>class Role &#123;<p class="paragraph"/>   <span class="java&#45;object">String</span> authority<p class="paragraph"/>   <span class="java&#45;keyword">static</span> mapping = &#123;
       cache <span class="java&#45;keyword">true</span>
    &#125;<p class="paragraph"/>   <span class="java&#45;keyword">static</span> constraints = &#123;
       authority blank: <span class="java&#45;keyword">false</span>, unique: <span class="java&#45;keyword">true</span>
@@ -49,7 +58,10 @@ Depending on your database, some domain class names might not be valid, especial
       <span class="java&#45;keyword">new</span> UserRole(user: user, role: role).save(flush: flush, insert: <span class="java&#45;keyword">true</span>)
    &#125;<p class="paragraph"/>   <span class="java&#45;keyword">static</span> <span class="java&#45;object">boolean</span> remove(User user, Role role, <span class="java&#45;object">boolean</span> flush = <span class="java&#45;keyword">false</span>) &#123;
       UserRole instance = UserRole.findByUserAndRole(user, role)
-      instance ? instance.delete(flush: flush) : <span class="java&#45;keyword">false</span>
+      <span class="java&#45;keyword">if</span> (!instance) &#123;
+         <span class="java&#45;keyword">return</span> <span class="java&#45;keyword">false</span>
+      &#125;<p class="paragraph"/>      instance.delete(flush: flush)
+      <span class="java&#45;keyword">true</span>
    &#125;<p class="paragraph"/>   <span class="java&#45;keyword">static</span> void removeAll(User user) &#123;
       executeUpdate 'DELETE FROM UserRole WHERE user=:user', &#91;user: user&#93;
    &#125;<p class="paragraph"/>   <span class="java&#45;keyword">static</span> mapping = &#123;
@@ -72,16 +84,14 @@ These generated files are not part of the plugin - these are your application fi
 &#125;</pre></div><p class="paragraph"/><h4>5. Start the server.</h4>
 <div class="code"><pre>$ grails run&#45;app</pre></div><p class="paragraph"/><h4>6. Before you secure the page, navigate to <a href="http://localhost:8080/bookstore/secure" target="blank">http://localhost:8080/bookstore/secure</a> to verify that you can see the page without being logged in.</h4><p class="paragraph"/><h4>7. Shut down the app (using CTRL-C) and edit grails-app/conf/BootStrap.groovy to add the security objects that you need.</h4><p class="paragraph"/><div class="code"><pre><span class="java&#45;keyword">import</span> com.testapp.Role
 <span class="java&#45;keyword">import</span> com.testapp.User
-<span class="java&#45;keyword">import</span> com.testapp.UserRole<p class="paragraph"/>class BootStrap &#123;<p class="paragraph"/>   def springSecurityService<p class="paragraph"/>   def init = &#123; servletContext &#45;&#62;<p class="paragraph"/>      def adminRole = <span class="java&#45;keyword">new</span> Role(authority: 'ROLE_ADMIN').save(flush: <span class="java&#45;keyword">true</span>)
-      def userRole = <span class="java&#45;keyword">new</span> Role(authority: 'ROLE_USER').save(flush: <span class="java&#45;keyword">true</span>)<p class="paragraph"/>      <span class="java&#45;object">String</span> password = springSecurityService.encodePassword('password')
-      def testUser = <span class="java&#45;keyword">new</span> User(username: 'me', enabled: <span class="java&#45;keyword">true</span>, password: password)
+<span class="java&#45;keyword">import</span> com.testapp.UserRole<p class="paragraph"/>class BootStrap &#123;<p class="paragraph"/>   def init = &#123; servletContext &#45;&#62;<p class="paragraph"/>      def adminRole = <span class="java&#45;keyword">new</span> Role(authority: 'ROLE_ADMIN').save(flush: <span class="java&#45;keyword">true</span>)
+      def userRole = <span class="java&#45;keyword">new</span> Role(authority: 'ROLE_USER').save(flush: <span class="java&#45;keyword">true</span>)<p class="paragraph"/>      def testUser = <span class="java&#45;keyword">new</span> User(username: 'me', enabled: <span class="java&#45;keyword">true</span>, password: 'password')
       testUser.save(flush: <span class="java&#45;keyword">true</span>)<p class="paragraph"/>      UserRole.create testUser, adminRole, <span class="java&#45;keyword">true</span><p class="paragraph"/>      assert User.count() == 1
       assert Role.count() == 2
       assert UserRole.count() == 1
    &#125;
 &#125;</pre></div><p class="paragraph"/>Some things to note about the preceding <code>BootStrap.groovy</code>:
 <ul class="star">
-<li><code>springSecurityService</code> is used to encrypt the password.</li>
 <li>The example does not use a traditional GORM many-to-many mapping for the User&#60;-&#62;Role relationship; instead you are mapping the join table with the <code>UserRole</code> class. This performance optimization helps significantly when many users have one or more common roles.</li>
 <li>We explicitly flushed the creates because <code>BootStrap</code> does not run in a transaction or OpenSessionInView.</li>
 </ul><p class="paragraph"/><h4>8. Edit grails-app/controllers/SecureController.groovy to import the annotation class and apply the annotation to restrict access.</h4><p class="paragraph"/><div class="code"><pre><span class="java&#45;keyword">package</span> com.testapp<p class="paragraph"/><span class="java&#45;keyword">import</span> grails.plugins.springsecurity.Secured<p class="paragraph"/>class SecureController &#123;<p class="paragraph"/>   @Secured(&#91;'ROLE_ADMIN'&#93;)
@@ -93,76 +103,9 @@ class SecureController &#123;
    def index = &#123;
       render 'Secure access only'
    &#125;
-&#125;</pre></div><p class="paragraph"/>You can annotate the entire controller or individual actions. In this case you have only one action, so you can do either.<p class="paragraph"/><h4>9. Run grails run-app again and navigate to <a href="http://localhost:8080/bookstore/secure" target="blank">http://localhost:8080/bookstore/secure</a>. </h4><p class="paragraph"/>This time, you should be presented with the login page. Log in with the username and password you used for the test user, and you should again be able to see the secure page.<p class="paragraph"/><h4>10. Test the Remember Me functionality. </h4>
-Check the checkbox, and once you've tested the secure page, close your browser and reopen it. Navigate again the the secure page. Because a is cookie stored, you should not need to log in again. Logout at any time by navigating to <a href="http://localhost:8080/bookstore/logout" target="blank">http://localhost:8080/bookstore/logout</a>.<p class="paragraph"/><h4>11. Optionally, create a CRUD UI to work with users and roles.</h4><p class="paragraph"/><h5>Run grails generate-all.</h5><p class="paragraph"/>The generated <code>UserController.save</code> action will look something like this:<p class="paragraph"/><div class="code"><pre>def save = &#123;
-   def userInstance = <span class="java&#45;keyword">new</span> User(params)
-   <span class="java&#45;keyword">if</span> (userInstance.save(flush: <span class="java&#45;keyword">true</span>)) &#123;
-      flash.message = <span class="java&#45;quote">"$&#123;message(code: '<span class="java&#45;keyword">default</span>.created.message', args: &#91;message(code: 'user.label', <span class="java&#45;keyword">default</span>: 'User'), userInstance.id&#93;)&#125;"</span>
-      redirect(action: <span class="java&#45;quote">"show"</span>, id: userInstance.id)
-   &#125;
-   <span class="java&#45;keyword">else</span> &#123;
-      render(view: <span class="java&#45;quote">"create"</span>, model: &#91;userInstance: userInstance&#93;)
-   &#125;
-&#125;</pre></div>
-This action will store cleartext passwords and you won't be able to authenticate.<p class="paragraph"/><h5>Add a call to encrypt the password with springSecurityService.</h5><p class="paragraph"/><div class="code"><pre>class UserController &#123;<p class="paragraph"/>   def springSecurityService<p class="paragraph"/>   ...<p class="paragraph"/>   def save = &#123;
-      def userInstance = <span class="java&#45;keyword">new</span> User(params)
-      userInstance.password = springSecurityService.encodePassword(params.password)
-      <span class="java&#45;keyword">if</span> (userInstance.save(flush: <span class="java&#45;keyword">true</span>)) &#123;
-         flash.message = <span class="java&#45;quote">"$&#123;message(code: '<span class="java&#45;keyword">default</span>.created.message', args: &#91;message(code: 'user.label', <span class="java&#45;keyword">default</span>: 'User'), userInstance.id&#93;)&#125;"</span>
-         redirect(action: <span class="java&#45;quote">"show"</span>, id: userInstance.id)
-      &#125;
-      <span class="java&#45;keyword">else</span> &#123;
-         render(view: <span class="java&#45;quote">"create"</span>, model: &#91;userInstance: userInstance&#93;)
-      &#125;
-   &#125;
-&#125;</pre></div><p class="paragraph"/><h5>When updating, you need to re-encrypt the password if it changes. Change this:</h5><p class="paragraph"/><div class="code"><pre>def update = &#123;
-   def userInstance = User.get(params.id)
-   <span class="java&#45;keyword">if</span> (userInstance) &#123;
-      <span class="java&#45;keyword">if</span> (params.version) &#123;
-         def version = params.version.toLong()
-         &#8230;
-      &#125;
-      userInstance.properties = params
-      <span class="java&#45;keyword">if</span> (!userInstance.hasErrors() &#38;&#38; userInstance.save(flush: <span class="java&#45;keyword">true</span>)) &#123;
-         flash.message = <span class="java&#45;quote">"$&#123;message(code: '<span class="java&#45;keyword">default</span>.updated.message', args: &#91;message(code: 'user.label', <span class="java&#45;keyword">default</span>: 'User'), userInstance.id&#93;)&#125;"</span>
-         redirect(action: <span class="java&#45;quote">"show"</span>, id: userInstance.id)
-      &#125;
-      <span class="java&#45;keyword">else</span> &#123;
-         render(view: <span class="java&#45;quote">"edit"</span>, model: &#91;userInstance: userInstance&#93;)
-      &#125;
-   &#125;
-   <span class="java&#45;keyword">else</span> &#123;
-      flash.message = <span class="java&#45;quote">"$&#123;message(code: '<span class="java&#45;keyword">default</span>.not.found.message', args: &#91;message(code: 'user.label', <span class="java&#45;keyword">default</span>: 'User'), params.id&#93;)&#125;"</span>
-      redirect(action: <span class="java&#45;quote">"list"</span>)
-   &#125;
-&#125;</pre></div><p class="paragraph"/><h5>to:</h5><p class="paragraph"/><div class="code"><pre>def update = &#123;
-   def userInstance = User.get(params.id)
-   <span class="java&#45;keyword">if</span> (userInstance) &#123;
-      <span class="java&#45;keyword">if</span> (params.version) &#123;
-         def version = params.version.toLong()
-         &#8230;
-      &#125;
-      <span class="java&#45;keyword">if</span> (userInstance.password != params.password) &#123;
-         params.password = springSecurityService.encodePassword(params.password)
-      &#125;
-      userInstance.properties = params
-      <span class="java&#45;keyword">if</span> (!userInstance.hasErrors() &#38;&#38; userInstance.save(flush: <span class="java&#45;keyword">true</span>)) &#123;
-         <span class="java&#45;keyword">if</span> (springSecurityService.loggedIn &#38;&#38;
-                springSecurityService.principal.username == userInstance.username) &#123;
-            springSecurityService.reauthenticate userInstance.username
-         &#125;
-         flash.message = <span class="java&#45;quote">"$&#123;message(code: '<span class="java&#45;keyword">default</span>.updated.message', args: &#91;message(code: 'user.label', <span class="java&#45;keyword">default</span>: 'User'), userInstance.id&#93;)&#125;"</span>
-         redirect(action: <span class="java&#45;quote">"show"</span>, id: userInstance.id)
-      &#125;
-      <span class="java&#45;keyword">else</span> &#123;
-         render(view: <span class="java&#45;quote">"edit"</span>, model: &#91;userInstance: userInstance&#93;)
-      &#125;
-   &#125;
-   <span class="java&#45;keyword">else</span> &#123;
-      flash.message = <span class="java&#45;quote">"$&#123;message(code: '<span class="java&#45;keyword">default</span>.not.found.message', args: &#91;message(code: 'user.label', <span class="java&#45;keyword">default</span>: 'User'), params.id&#93;)&#125;"</span>
-      redirect(action: <span class="java&#45;quote">"list"</span>)
-   &#125;
-&#125;</pre></div><p class="paragraph"/>Note the call to <code>springSecurityService.reauthenticate()</code> to ensure that the cached <code>Authentication</code> stays current.<p class="paragraph"/>
+&#125;</pre></div><p class="paragraph"/>You can annotate the entire controller or individual actions. In this case you have only one action, so you can do either.<p class="paragraph"/><h4>9. Run grails run-app again and navigate to <a href="http://localhost:8080/bookstore/secure" target="blank">http://localhost:8080/bookstore/secure</a>.</h4><p class="paragraph"/>This time, you should be presented with the login page. Log in with the username and password you used for the test user, and you should again be able to see the secure page.<p class="paragraph"/><h4>10. Test the Remember Me functionality.</h4>
+Check the checkbox, and once you've tested the secure page, close your browser and reopen it. Navigate again the the secure page. Because a is cookie stored, you should not need to log in again. Logout at any time by navigating to <a href="http://localhost:8080/bookstore/logout" target="blank">http://localhost:8080/bookstore/logout</a>.<p class="paragraph"/><h4>11. Optionally, create a CRUD UI to work with users and roles.</h4><p class="paragraph"/><h5>Run grails generate-all for the domain classes:</h5><p class="paragraph"/><div class="code"><pre>$ grails generate&#45;all com.testapp.User</pre></div><p class="paragraph"/><div class="code"><pre>$ grails generate&#45;all com.testapp.Role</pre></div><p class="paragraph"/>Since the User domain class handles password encryption, there are no changes required in the generated controllers.
+
     
 <script type="text/javascript">
 	var _gaq = _gaq || [];

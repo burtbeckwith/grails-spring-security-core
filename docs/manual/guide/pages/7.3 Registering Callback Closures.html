@@ -15,7 +15,8 @@
    // handle AuthenticationSwitchUserEvent
 &#125;<p class="paragraph"/>grails.plugins.springsecurity.onAuthorizationEvent = &#123; e, appCtx &#45;&#62;
    // handle AuthorizationEvent
-&#125;</pre></div><p class="paragraph"/>None of these closures are required; if none are configured, nothing will be called. Just implement the event handlers that you need.<p class="paragraph"/><strong class="bold">Note:</strong> When a user authenticates, Spring Security initially fires an <code>AuthenticationSuccessEvent</code>. This event fires before the <code>Authentication</code> is registered in the <code>SecurityContextHolder</code>, which means that the <code>springSecurityService</code> methods that access the logged-in user will not work. Later in the processing a second event is fired, an <code>InteractiveAuthenticationSuccessEvent</code>, and when this happens the <code>SecurityContextHolder</code> will have the <code>Authentication</code>. Depending on your needs, you can implement a callback for either or both events.<p class="paragraph"/>
+&#125;</pre></div><p class="paragraph"/>None of these closures are required; if none are configured, nothing will be called. Just implement the event handlers that you need.<p class="paragraph"/><strong class="bold">Note:</strong> When a user authenticates, Spring Security initially fires an <code>AuthenticationSuccessEvent</code>. This event fires before the <code>Authentication</code> is registered in the <code>SecurityContextHolder</code>, which means that the <code>springSecurityService</code> methods that access the logged-in user will not work. Later in the processing a second event is fired, an <code>InteractiveAuthenticationSuccessEvent</code>, and when this happens the <code>SecurityContextHolder</code> will have the <code>Authentication</code>. Depending on your needs, you can implement a callback for either or both events.
+
     
 <script type="text/javascript">
 	var _gaq = _gaq || [];

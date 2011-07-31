@@ -23,7 +23,10 @@
       <span class="java&#45;keyword">new</span> UserRole(user: user, role: role).save(flush: flush, insert: <span class="java&#45;keyword">true</span>)
    &#125;<p class="paragraph"/>   <span class="java&#45;keyword">static</span> <span class="java&#45;object">boolean</span> remove(User user, Role role, <span class="java&#45;object">boolean</span> flush = <span class="java&#45;keyword">false</span>) &#123;
       UserRole instance = UserRole.findByUserAndRole(user, role)
-      instance ? instance.delete(flush: flush) : <span class="java&#45;keyword">false</span>
+      <span class="java&#45;keyword">if</span> (!instance) &#123;
+         <span class="java&#45;keyword">return</span> <span class="java&#45;keyword">false</span>
+      &#125;<p class="paragraph"/>      instance.delete(flush: flush)
+      <span class="java&#45;keyword">true</span>
    &#125;<p class="paragraph"/>   <span class="java&#45;keyword">static</span> void removeAll(User user) &#123;
       executeUpdate 'DELETE FROM UserRole WHERE user=:user', &#91;user: user&#93;
    &#125;<p class="paragraph"/>   <span class="java&#45;keyword">static</span> mapping = &#123;
@@ -38,7 +41,8 @@ UserRole.create user, role, <span class="java&#45;keyword">true</span></pre></di
 Role role = &#8230;
 UserRole.remove user, role</pre></div><p class="paragraph"/>Or:<p class="paragraph"/><div class="code"><pre>User user = &#8230;
 Role role = &#8230;
-UserRole.remove user, role, <span class="java&#45;keyword">true</span></pre></div><p class="paragraph"/>The class name is the only configurable attribute:<p class="paragraph"/><table class="wiki-table" cellpadding="0" cellspacing="0" border="0"><tr><th><strong class="bold">Property</strong></th><th><strong class="bold">Default Value</strong></th><th><strong class="bold">Meaning</strong></th></tr><tr class="table-odd"><td>userLookup.authorityJoinClassName</td><td>'PersonAuthority'</td><td>User/Role many-many join class name</td></tr></table><p class="paragraph"/>
+UserRole.remove user, role, <span class="java&#45;keyword">true</span></pre></div><p class="paragraph"/>The class name is the only configurable attribute:<p class="paragraph"/><table class="wiki-table" cellpadding="0" cellspacing="0" border="0"><tr><th><strong class="bold">Property</strong></th><th><strong class="bold">Default Value</strong></th><th><strong class="bold">Meaning</strong></th></tr><tr class="table-odd"><td>userLookup.authorityJoinClassName</td><td>'PersonAuthority'</td><td>User/Role many-many join class name</td></tr></table>
+
     
 <script type="text/javascript">
 	var _gaq = _gaq || [];
